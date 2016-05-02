@@ -59,6 +59,8 @@ export default class OoyalaApi {
   get(path, params={}, options={}) {
     const isList = !!options.pagination;
 
+    this.results = [];
+
     params['expires'] = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
     params['api_key'] = this.key;
     params['signature'] = this.sign('GET', path, params);
@@ -84,7 +86,7 @@ export default class OoyalaApi {
       if (isList) {
         this.results = this.results.concat(body.items);
         if (body.nextUrl) {
-          return this.sendRequest(body.nextUrl);
+          return fetch(body.nextUrl);
         } else {
           this.logging && console.log(this.results);
           return this.results;
