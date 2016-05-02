@@ -1,6 +1,6 @@
 {
   "name": "ooyala-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ooyala API client for Node.js",
   "keywords": [
     "Ooyala"
