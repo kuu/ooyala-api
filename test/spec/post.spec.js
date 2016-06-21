@@ -52,13 +52,14 @@ describe('POST/PATCH/DELETE', () => {
       cb();
     });
   });
-*/
+
   it('should be able to delete the asset', (cb) => {
     api.delete(`/v2/assets/${embedCode}`)
     .then((result) => {
-      //console.log(result);
+      console.log(`DELETE result=${result}`);
       expect(result).not.toBe(null);
       cb();
     });
   });
+  */
 });

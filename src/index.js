@@ -57,13 +57,34 @@ export default class OoyalaApi {
   }
 
   get(path, params={}, options={}) {
+    return this.send('GET', path, params, null, options);
+  }
+
+  post(path, params={}, body={}) {
+    return this.send('POST', path, params, body);
+  }
+
+  put(path, params={}, body={}) {
+    return this.send('PUT', path, params, body);
+  }
+
+  delete(path, params={}) {
+    return this.send('DELETE', path, params, null);
+  }
+
+  patch(path, params={}, body={}) {
+    return this.send('PATCH', path, params, body);
+  }
+
+  send(method, path, params={}, body={}, options={}) {
     const isList = !!options.pagination;
+    const bodyStr = body ? stringify(body) : '';
 
     this.results = [];
 
     params['expires'] = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
     params['api_key'] = this.key;
-    params['signature'] = this.sign('GET', path, params);
+    params['signature'] = this.sign(method, path, params, bodyStr);
 
     const requestURL = [
       `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
@@ -72,15 +93,15 @@ export default class OoyalaApi {
       ].join('&')
     ].join('?');
 
-    this.logging && console.log('----------');
-    this.logging && console.log(`[GET] ${requestURL}`);
+    this.logging && console.log(`[${method}] ${requestURL}
+    ${bodyStr}`);
 
-    return fetch(requestURL)
+    return fetch(requestURL, {method, body: bodyStr})
     .then((res) => {
       if (res.status === 200) {
         return res.json();
       } else {
-        return {items: []};
+        return isList ? {items: []} : {};
       }
     }).then((body) => {
       if (isList) {
@@ -95,94 +116,6 @@ export default class OoyalaApi {
         this.logging && console.log(body);
         return body;
       }
-    });
-  }
-
-  post(path, params={}, body={}) {
-    let bodyStr = stringify(body);
-
-    params['expires'] = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
-    params['api_key'] = this.key;
-    params['signature'] = this.sign('POST', path, params, bodyStr);
-
-    const requestURL = [
-      `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
-      [
-        querystring.stringify(params).replace(/'|\\'/g, '%27')
-      ].join('&')
-    ].join('?');
-
-    this.logging && console.log('----------');
-    this.logging && console.log(`[POST] ${requestURL}`);
-
-    return fetch(requestURL, {method: 'POST', body: bodyStr})
-    .then((res) => {
-      if (res.status === 200) {
-        return res.json();
-      } else {
-        return {};
-      }
-    }).then((body) => {
-      this.logging && console.log(body);
-      return body;
-    });
-  }
-
-  delete(path, params={}) {
-    params['expires'] = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
-    params['api_key'] = this.key;
-    params['signature'] = this.sign('DELETE', path, params);
-
-    const requestURL = [
-      `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
-      [
-        querystring.stringify(params).replace(/'|\\'/g, '%27')
-      ].join('&')
-    ].join('?');
-
-    this.logging && console.log('----------');
-    this.logging && console.log(`[DELETE] ${requestURL}`);
-
-    return fetch(requestURL, {method: 'DELETE'})
-    .then((res) => {
-      if (res.status === 200) {
-        return res.text();
-      } else {
-        return {};
-      }
-    }).then((body) => {
-      this.logging && console.log(body);
-      return body;
-    });
-  }
-
-  patch(path, params={}, body={}) {
-    let bodyStr = stringify(body);
-
-    params['expires'] = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
-    params['api_key'] = this.key;
-    params['signature'] = this.sign('POST', path, params, bodyStr);
-
-    const requestURL = [
-      `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
-      [
-        querystring.stringify(params).replace(/'|\\'/g, '%27')
-      ].join('&')
-    ].join('?');
-
-    this.logging && console.log('----------');
-    this.logging && console.log(`[PATCH] ${requestURL}`);
-
-    return fetch(requestURL, {method: 'PATCH', body: bodyStr})
-    .then((res) => {
-      if (res.status === 200) {
-        return res.json();
-      } else {
-        return {};
-      }
-    }).then((body) => {
-      this.logging && console.log(body);
-      return body;
     });
   }
 }
