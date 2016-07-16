@@ -3,6 +3,7 @@ import querystring from 'querystring';
 import crypto from 'crypto';
 
 const API_SERVER = 'api.ooyala.com';
+const TOKEN_SERVER = 'player.ooyala.com';
 
 function serialize(params, delimiter, sort) {
   let keys = Object.keys(params);
@@ -117,5 +118,30 @@ export default class OoyalaApi {
         return body;
       }
     });
+  }
+
+  getTokenRequest(embedCode, accountId='') {
+    this.logging && console.log(`getTokenRequest(embedCode="${embedCode}", accountId="${accountId}"`);
+
+    const pcode = getPcode(this.key);
+    const path = `/sas/embed_token/${pcode}/${embedCode}`;
+    const params = {};
+    params['expires'] = Math.floor(Date.now() / 1000) + this.expirationTime;
+    params['api_key'] = this.key;
+    if (accountId) {
+      params['account_id'] = accountId;
+    }
+    params['signature'] = this.sign('GET', path, params);
+
+    const token = [
+      `http://${TOKEN_SERVER}${path}`,
+      [
+        querystring.stringify(params).replace(/'|\\'/g, '%27')
+      ].join('&')
+    ].join('?');
+
+    this.logging && console.log(`token="${token}"`);
+
+    return token;
   }
 }

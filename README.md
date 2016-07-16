@@ -48,3 +48,26 @@ api.delete(`/v2/assets/${embedCode}`)
   console.log(result);
 });
 ```
+
+## CLI
+Currently, only one command (`token`) is supported.
+```
+Usage:
+    oo [options] command [parameters]
+
+Options:
+  -h, --help    Print help
+  -v, --version Print version
+
+Commands:
+  token           Generates Ooyala player token (OPT) request URL. Parameters: embedCode, [accountId]
+
+Parameters:
+  embedCode     Content id or a comma-separated list of content ids
+  accountId     Viewer's login id
+
+Example:
+  oo -v
+  oo token --embedCode xxxx
+  oo token --embedCode xxxx,yyyy --accountId david1203
+```
