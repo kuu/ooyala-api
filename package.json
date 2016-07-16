@@ -2,6 +2,10 @@
   "name": "ooyala-api",
   "version": "0.1.0",
   "description": "Ooyala API client for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:kuu/ooyala-api.git"
+  },
   "keywords": [
     "Ooyala"
   ],
