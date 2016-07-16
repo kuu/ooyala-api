@@ -1,6 +1,6 @@
 {
   "name": "ooyala-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ooyala API client for Node.js",
   "repository": {
     "type": "git",
