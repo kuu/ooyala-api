@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "crypto": "0.0.3",
+    "debug": "^2.2.0",
     "dist-es6": "^0.1.15",
     "node-fetch": "^1.5.1",
     "yargs": "^4.8.0"

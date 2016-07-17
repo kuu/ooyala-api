@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
 import querystring from 'querystring';
 import crypto from 'crypto';
+import debug from 'debug';
 
 const API_SERVER = 'api.ooyala.com';
 const TOKEN_SERVER = 'player.ooyala.com';
+const print = debug('oo');
 
 function serialize(params, delimiter, sort) {
   let keys = Object.keys(params);
@@ -48,7 +50,6 @@ export default class OoyalaApi {
     this.secure = !!options.secure;
     this.expirationTime = Math.floor(options.expirationTime || (24 * 60 * 60));
     this.results = [];
-    this.logging = !!options.log;
   }
 
   sign(method, path, params, body='') {
@@ -94,7 +95,7 @@ export default class OoyalaApi {
       ].join('&')
     ].join('?');
 
-    this.logging && console.log(`[${method}] ${requestURL}
+    print(`[${method}] ${requestURL}
     ${bodyStr}`);
 
     return fetch(requestURL, {method, body: bodyStr})
@@ -110,18 +111,18 @@ export default class OoyalaApi {
         if (body.nextUrl) {
           return fetch(body.nextUrl);
         } else {
-          this.logging && console.log(this.results);
+          print(this.results);
           return this.results;
         }
       } else {
-        this.logging && console.log(body);
+        print(body);
         return body;
       }
     });
   }
 
   getTokenRequest(embedCode, accountId='') {
-    this.logging && console.log(`getTokenRequest(embedCode="${embedCode}", accountId="${accountId}"`);
+    print(`getTokenRequest(embedCode="${embedCode}", accountId="${accountId}"`);
 
     const pcode = getPcode(this.key);
     const path = `/sas/embed_token/${pcode}/${embedCode}`;
@@ -140,7 +141,7 @@ export default class OoyalaApi {
       ].join('&')
     ].join('?');
 
-    this.logging && console.log(`token="${token}"`);
+    print(`token="${token}"`);
 
     return token;
   }

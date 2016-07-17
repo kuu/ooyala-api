@@ -33,8 +33,7 @@ Please put config file(s) in your work directory.
      "key":        {Your Ooyala API Key},
      "secret":     {Your Ooyala API Secret},
      "period":     {The period during which the api request is valid (in seconds. default=86400)}
-   },
-   "debug":        {Whether to print logs, true/false}
+   }
  }
 `;
 
@@ -57,7 +56,7 @@ if (!config.api) {
   console.info(VERSION);
 } else {
   const command = argv._[0];
-  const api = new OoyalaApi(config.api.key, config.api.secret, {expirationTime: config.api.period, log: config.debug});
+  const api = new OoyalaApi(config.api.key, config.api.secret, {expirationTime: config.api.period});
   switch (command) {
   case 'token':
     if (argv.embedCode) {
