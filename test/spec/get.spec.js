@@ -10,7 +10,7 @@ describe('GET', () => {
   });
 
   it('should be able to get assets of a specific label', (cb) => {
-    api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {pagination: true})
+    api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
     .then((results) => {
       //console.log(results);
       expect(results).not.toBe(null);

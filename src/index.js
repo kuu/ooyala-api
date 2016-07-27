@@ -49,8 +49,6 @@ export default class OoyalaApi {
     this.secret = secret;
     this.secure = !!options.secure;
     this.expirationTime = Math.floor(options.expirationTime || (24 * 60 * 60));
-    this.results = [];
-    this.recursive = false;
   }
 
   sign(method, path, params, body='') {
@@ -60,8 +58,9 @@ export default class OoyalaApi {
   }
 
   get(path, params={}, options={}) {
-    this.recursive = !!options.recursive;
-    this.results = [];
+    if (options.recursive) {
+      options.results = [];
+    }
     return this.send('GET', path, params, null, options);
   }
 
@@ -103,11 +102,12 @@ export default class OoyalaApi {
       if (res.status === 200) {
         return res.json();
       } else {
-        return this.recursive ? {items: []} : {};
+        return options.recursive ? {items: []} : {};
       }
     }).then(body => {
-      if (this.recursive) {
-        this.results = this.results.concat(body.items);
+      if (options.recursive) {
+        print(`Already retrieved: ${options.results.length}, newly retrieved: ${body.items.length}`);
+        options.results = options.results.concat(body.items);
         if (body.next_page) {
           const [path, params] = body.next_page.split('?');
           const paramsObj = {};
@@ -115,10 +115,10 @@ export default class OoyalaApi {
             const [key, value] = param.split('=');
             paramsObj[key] = value;
           });
-          return this.send('GET', path, paramsObj, null);
+          return this.send('GET', path, paramsObj, null, options);
         } else {
-          print(`Results: ${this.results}`);
-          return this.results;
+          print(`Results: ${options.results.length} items`);
+          return options.results;
         }
       } else {
         print(body);
