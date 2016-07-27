@@ -23,7 +23,7 @@ api.get(`/v2/assets/${embedCode}`)
 });
 
 // GET (with params + pagination)
-api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {pagination: true})
+api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
 .then((items) => {
   // All items in an array (recursive calls will be done internally)
   console.log(items);
