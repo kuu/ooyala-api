@@ -1,8 +1,8 @@
-import yargs from 'yargs';
+import minimist from 'minimist';
 import config from 'config';
 import OoyalaApi from 'ooyala-api';
 
-const argv = yargs.argv;
+const argv = minimist(process.argv.slice(2));
 const HELP_TEXT = `
 Usage:
     oo [options] command [parameters]
