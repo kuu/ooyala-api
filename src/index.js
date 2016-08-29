@@ -99,6 +99,7 @@ export default class OoyalaApi {
 
     return fetch(requestURL, {method, body: bodyStr})
     .then(res => {
+      print(`${res.status} ${res.statusText}`);
       if (res.status === 200) {
         return res.json();
       } else {

@@ -50,6 +50,19 @@ api.delete(`/v2/assets/${embedCode}`)
 ```
 
 ## CLI
+Please put config file(s) in your work directory.
+```js
+ $ mkdir config
+ $ vi config/default.json
+ {
+   "api": {
+     "key":        {Your Ooyala API Key},
+     "secret":     {Your Ooyala API Secret},
+     "period":     {The period during which the api request is valid (in seconds. default=86400)}
+   }
+ }
+```
+
 Currently, only one command (`token`) is supported.
 ```
 Usage:
