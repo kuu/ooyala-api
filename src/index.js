@@ -129,7 +129,7 @@ export default class OoyalaApi {
   }
 
   getTokenRequest(embedCode, accountId='') {
-    print(`getTokenRequest(embedCode="${embedCode}", accountId="${accountId}"`);
+    print(`getTokenRequest(embedCode="${embedCode}", accountId="${accountId}")`);
 
     const pcode = getPcode(this.key);
     const path = `/sas/embed_token/${pcode}/${embedCode}`;

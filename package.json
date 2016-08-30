@@ -35,6 +35,8 @@
     "lint": "eslint src/ test/",
     "test": "npm run lint && jasmine JASMINE_CONFIG_PATH=jasmine.json",
     "token": "oo token --embedCode",
+    "sign": "oo sign --url",
+    "signBody": "oo sign --url /hoge?foo=bar --body",
     "prepublish": "dist-es6"
   }
 }

@@ -1,7 +1,10 @@
+import URL from 'url';
 import minimist from 'minimist';
+import debug from 'debug';
 import config from 'config';
 import OoyalaApi from 'ooyala-api';
 
+const print = debug('oo');
 const argv = minimist(process.argv.slice(2));
 const HELP_TEXT = `
 Usage:
@@ -11,6 +14,9 @@ Example:
     oo -v
     oo token --embedCode xxxx
     oo token --embedCode xxxx,yyyy --accountId david1203
+    oo sign --url /hoge?foo=bar
+    oo sign --url /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}'
+    oo sign --url /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}' --method PATCH
 
 Options:
   -h, --help    Print help
@@ -18,10 +24,14 @@ Options:
 
 Commands:
   token           Generates Ooyala player token (OPT) request URL. Parameters: embedCode, [accountId]
+  sign            Generates signature based on given params (method, url, body)
 
 Parameters:
   embedCode     Content id or a comma-separated list of content ids
   accountId     Viewer's login id
+  method        (GET | POST | PUT | DELETE | PATCH) default = GET
+  url           URL string (relative url)
+  body          Body string
 `;
 
 const CONFIG_HELP_TEXT = `
@@ -60,10 +70,43 @@ if (!config.api) {
   switch (command) {
   case 'token':
     if (argv.embedCode) {
-      console.log(api.getTokenRequest(argv.embedCode, argv.accountId, argv.method));
+      print(`token: embedCode='${argv.embedCode}' accountId='${argv.accountId}'`)
+      console.log(api.getTokenRequest(argv.embedCode, argv.accountId));
+    } else {
+      console.info(HELP_TEXT);
+    }
+    break;
+  case 'sign':
+    if (argv.url) {
+      const {method, path, params, body} = parseSignArgs(argv);
+      print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
+      console.log(api.sign(method, path, params, body));
     } else {
       console.info(HELP_TEXT);
     }
     break;
   }
+}
+
+function parseSignArgs({method, url, body}) {
+  const {pathname, query} = URL.parse(argv.url, true);
+  const bodyStr = parseBody(body);
+  if (!method) {
+    method = bodyStr ? 'POST' : 'GET';
+  }
+  return {method, path: pathname, params: query, body: bodyStr};
+}
+
+function parseBody(body) {
+  if (!body) {
+    return '';
+  }
+  if (typeof body === 'object') {
+    try {
+      return JSON.stringify(obj);
+    } catch (e) {
+      return '';
+    }
+  }
+  return body + '';
 }

@@ -63,7 +63,7 @@ Please put config file(s) in your work directory.
  }
 ```
 
-Currently, only one command (`token`) is supported.
+Currently, only two commands (`token` and `sign`) are supported.
 ```
 Usage:
     oo [options] command [parameters]
@@ -74,13 +74,20 @@ Options:
 
 Commands:
   token           Generates Ooyala player token (OPT) request URL. Parameters: embedCode, [accountId]
+  sign            Generates signature based on given params (method, url, body)
 
 Parameters:
   embedCode     Content id or a comma-separated list of content ids
   accountId     Viewer's login id
+  method        (GET | POST | PUT | DELETE | PATCH) default = GET
+  url           URL string (relative url)
+  body          Body string
 
 Example:
   oo -v
   oo token --embedCode xxxx
   oo token --embedCode xxxx,yyyy --accountId david1203
+  oo sign --url /hoge?foo=bar
+  oo sign --url /hoge?foo=bar --body {"data": {"comment": "This is JSON"}}
+  oo sign --url /hoge?foo=bar --body {"data": {"comment": "This is JSON"}} --method PATCH
 ```
