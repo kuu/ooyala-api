@@ -1,12 +1,10 @@
 # ooyala-api
 
-`ooyala-api` is available as an [npm package](https://www.npmjs.com/package/ooyala-api).
+Ooyala API client for Node.js
+[![Build Status](https://travis-ci.org/kuu/ooyala-api.svg?branch=master)](http://travis-ci.org/kuu/ooyala-api)
 
 ## Install
-```
-$ cd /Your/Project/Directory
-$ npm install --save ooyala-api
-```
+[![NPM](https://nodei.co/npm/ooyala-api.png?mini=true)](https://nodei.co/npm/ooyala-api/)
 
 ## API
 ```js
