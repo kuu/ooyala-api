@@ -23,9 +23,11 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
+    "from2-array": "0.0.4",
     "nsp": "^2.6.1",
     "proxyquire": "^1.7.10",
     "sinon": "^1.17.5",
+    "through2": "^2.0.1",
     "xo": "^0.16.0"
   },
   "scripts": {
