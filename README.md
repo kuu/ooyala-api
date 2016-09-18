@@ -1,7 +1,10 @@
+[![NPM version](https://badge.fury.io/js/ooyala-api.png)](https://badge.fury.io/js/ooyala-api)
+[![Build Status](https://travis-ci.org/kuu/ooyala-api.svg?branch=master)](https://travis-ci.org/kuu/ooyala-api)
+[![Dependency Status](https://gemnasium.com/kuu/ooyala-api.png)](https://gemnasium.com/kuu/ooyala-api)
+
 # ooyala-api
 
-Ooyala API client for Node.js
-[![Build Status](https://travis-ci.org/kuu/ooyala-api.svg?branch=master)](http://travis-ci.org/kuu/ooyala-api)
+Ooyala API client library and CLI for Node.js
 
 ## Install
 [![NPM](https://nodei.co/npm/ooyala-api.png?mini=true)](https://nodei.co/npm/ooyala-api/)
@@ -10,7 +13,7 @@ Ooyala API client for Node.js
 ```js
 const OoyalaApi = require('ooyala-api');
 
-const api = new OoyalaApi('Your Ooyala API Key', 'Your Ooyala API Secret', {log: true});
+const api = new OoyalaApi('{Your Ooyala API Key}', '{Your Ooyala API Secret}', {concurrency: 6});
 const embedCode = 'Content ID';
 
 // GET
@@ -46,6 +49,14 @@ api.delete(`/v2/assets/${embedCode}`)
   console.log(result);
 });
 ```
+
+### `options`
+| API         | Option Name    | Type    | Default | Meaning                                  |
+| ----------- | -------------- |:-------:|:-------:| :----------------------------------------|
+| constructor | secure         | Boolean | false   | If true, the library sends https request |
+| constructor | expirationTime | Integer | 86400   | TTL of the API call in seconds           |
+| constructor | concurrency    | Integer | 5       | Limits the number of concurrent API calls. The valid range is 1~10 |
+| get         | recursive      | Boolean | false   | If true, the library calls API recursively as long as  `next_page` is specified in the response |
 
 ## CLI
 Please put config file(s) in your work directory.
