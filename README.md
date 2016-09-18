@@ -10,7 +10,7 @@ $ npm install --save ooyala-api
 
 ## API
 ```js
-import OoyalaApi from 'ooyala-api';
+const OoyalaApi = require('ooyala-api');
 
 const api = new OoyalaApi('Your Ooyala API Key', 'Your Ooyala API Secret', {log: true});
 const embedCode = 'Content ID';

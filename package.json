@@ -9,34 +9,40 @@
   "keywords": [
     "Ooyala"
   ],
-  "main": "src/index.js",
+  "main": "./lib.js",
   "bin": {
-    "oo": "src/cli.js"
+    "oo": "./cli.js"
   },
   "author": "Kuu Miyazaki",
   "license": "MIT",
-  "files": [
-    "README.md"
-  ],
   "dependencies": {
     "config": "^1.21.0",
-    "crypto": "0.0.3",
     "debug": "^2.2.0",
-    "dist-es6": "^0.1.18",
     "minimist": "^1.2.0",
-    "node-fetch": "^1.6.0"
+    "node-fetch": "^1.6.1"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.14.0",
-    "eslint": "^2.13.1",
-    "jasmine-es6": "^0.1.10"
+    "ava": "^0.16.0",
+    "nsp": "^2.6.1",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.5",
+    "xo": "^0.16.0"
   },
   "scripts": {
-    "lint": "eslint src/ test/",
-    "test": "npm run lint && jasmine JASMINE_CONFIG_PATH=jasmine.json",
-    "token": "oo token --embedCode",
-    "sign": "oo sign --url",
-    "signBody": "oo sign --url /hoge?foo=bar --body",
-    "prepublish": "dist-es6"
+    "oo": "oo",
+    "lint": "xo",
+    "test": "npm run lint && nsp check && ava --verbose",
+    "token": "oo token",
+    "sign": "oo sign"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "xo": {
+    "esnext": true,
+    "space": true,
+    "rules": {
+      "camelcase": 0
+    }
   }
 }

@@ -1,65 +1,45 @@
-import OoyalaApi from 'ooyala-api';
-import config from 'config';
+const test = require('ava');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
-describe('POST/PATCH/DELETE', () => {
+const mock = {
+  fetch(url, params) {
+    console.log(`[mockFetch] url=${url}, params=${params}`);
+    return Promise.resolve({status: 200, statusText: 'OK', json: mock.json});
+  },
 
-  let api, embedCode;
+  json() {
+    return Promise.resolve({});
+  }
+};
 
-  beforeEach(() => {
-    api = new OoyalaApi(config.api.key, config.api.secret);
+// Override dependencies
+const mockFetch = sinon.spy(mock, 'fetch');
+const OoyalaApi = proxyquire('../../lib', {'node-fetch': mockFetch});
+
+const API_KEY = '123456';
+const API_SECRET = 'abcdef';
+const api = new OoyalaApi(API_KEY, API_SECRET);
+const FLASH_URL = 'http://flash_url.com';
+
+// let embedCode;
+
+test('post', t => {
+  const body = {
+    name: `test ${Date()}`,
+    asset_type: 'remote_asset',
+    is_live_stream: true,
+    stream_urls: {
+      flash: FLASH_URL,
+      iphone: 'http://iphone_url.com'
+    }
+  };
+  return api.post('/v2/assets', {}, body).then(result => {
+    t.not(result, null);
+    const requestURL = 'http://api.ooyala.com/v2/assets';
+    const params = {method: 'POST', body: JSON.stringify(body)};
+    t.true(mockFetch.calledWithMatch(requestURL, params));
+  }).catch(err => {
+    t.fail(`error occurred.: ${err.trace}`);
   });
-
-  const FLASH_URL = 'http://flash_url.com';
-
-  it('should be able to create an asset', (cb) => {
-    api.post('/v2/assets', {}, {
-      name: `test ${Date()}`,
-      asset_type: 'remote_asset',
-      is_live_stream: true,
-      stream_urls: {
-        'flash': FLASH_URL,
-        'iphone': 'http://iphone_url.com'
-      }
-    }).then((result) => {
-      //console.log(result);
-      embedCode = result['embed_code'];
-      expect(result).not.toBe(null);
-      cb();
-    });
-  });
-
-  it('should be able to get the asset', (cb) => {
-    api.get(`/v2/assets/${embedCode}`)
-    .then((result) => {
-      //console.log(result);
-      expect(result).not.toBe(null);
-      expect(result['stream_urls'].flash).toBe(FLASH_URL);
-      cb();
-    });
-  });
-/* TODO
-  const NEW_FLASH_URL = 'http://fresh_url.com';
-
-  it('should be able to update the asset', (cb) => {
-    api.patch(`/v2/assets/${embedCode}`, {}, {
-      stream_urls: {
-        'flash': NEW_FLASH_URL
-      }
-    }).then((result) => {
-      //console.log(result);
-      expect(result).not.toBe(null);
-      expect(result['stream_urls'].flash).toBe(NEW_FLASH_URL);
-      cb();
-    });
-  });
-
-  it('should be able to delete the asset', (cb) => {
-    api.delete(`/v2/assets/${embedCode}`)
-    .then((result) => {
-      console.log(`DELETE result=${result}`);
-      expect(result).not.toBe(null);
-      cb();
-    });
-  });
-  */
 });

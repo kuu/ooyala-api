@@ -1,8 +1,10 @@
-import URL from 'url';
-import minimist from 'minimist';
-import debug from 'debug';
-import config from 'config';
-import OoyalaApi from 'ooyala-api';
+#!/usr/bin/env node
+const URL = require('url');
+const minimist = require('minimist');
+const debug = require('debug');
+const config = require('config');
+const pkg = require('../package.json');
+const OoyalaApi = require('./lib');
 
 const print = debug('oo');
 const argv = minimist(process.argv.slice(2));
@@ -47,15 +49,6 @@ Please put config file(s) in your work directory.
  }
 `;
 
-let pkg;
-
-try {
-  pkg = require('./package.json');
-} catch (e) {
-  // Being executed locally
-  pkg = require('../package.json');
-}
-
 const VERSION = `v${pkg.version}`;
 
 if (!config.api) {
@@ -68,28 +61,30 @@ if (!config.api) {
   const command = argv._[0];
   const api = new OoyalaApi(config.api.key, config.api.secret, {expirationTime: config.api.period});
   switch (command) {
-  case 'token':
-    if (argv.embedCode) {
-      print(`token: embedCode='${argv.embedCode}' accountId='${argv.accountId}'`)
-      console.log(api.getTokenRequest(argv.embedCode, argv.accountId));
-    } else {
+    case 'token':
+      if (argv.embedCode) {
+        print(`token: embedCode='${argv.embedCode}' accountId='${argv.accountId}'`);
+        console.log(api.getTokenRequest(argv.embedCode, argv.accountId));
+      } else {
+        console.info(HELP_TEXT);
+      }
+      break;
+    case 'sign':
+      if (argv.url) {
+        const {method, path, params, body} = parseSignArgs(argv);
+        print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
+        console.log(api.sign(method, path, params, body));
+      } else {
+        console.info(HELP_TEXT);
+      }
+      break;
+    default:
       console.info(HELP_TEXT);
-    }
-    break;
-  case 'sign':
-    if (argv.url) {
-      const {method, path, params, body} = parseSignArgs(argv);
-      print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
-      console.log(api.sign(method, path, params, body));
-    } else {
-      console.info(HELP_TEXT);
-    }
-    break;
   }
 }
 
 function parseSignArgs({method, url, body}) {
-  const {pathname, query} = URL.parse(argv.url, true);
+  const {pathname, query} = URL.parse(url, true);
   const bodyStr = parseBody(body);
   if (!method) {
     method = bodyStr ? 'POST' : 'GET';
@@ -103,10 +98,10 @@ function parseBody(body) {
   }
   if (typeof body === 'object') {
     try {
-      return JSON.stringify(obj);
-    } catch (e) {
+      return JSON.stringify(body);
+    } catch (err) {
       return '';
     }
   }
-  return body + '';
+  return String(body);
 }

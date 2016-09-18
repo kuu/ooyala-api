@@ -1,24 +1,35 @@
-import OoyalaApi from 'ooyala-api';
-import config from 'config';
+const test = require('ava');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
-describe('GET', () => {
+const mock = {
+  fetch(url, params) {
+    console.log(`[mockFetch] url=${url}, params=${params}`);
+    return Promise.resolve({status: 200, statusText: 'OK', json: mock.json});
+  },
 
-  let api;
+  json() {
+    return Promise.resolve({items: [{}]});
+  }
+};
 
-  beforeEach(() => {
-    api = new OoyalaApi(config.api.key, config.api.secret);
-  });
+// Override dependencies
+const mockFetch = sinon.spy(mock, 'fetch');
+const OoyalaApi = proxyquire('../../lib', {'node-fetch': mockFetch});
 
-  it('should be able to get assets of a specific label', (cb) => {
-    api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
-    .then((results) => {
-      //console.log(results);
-      expect(results).not.toBe(null);
-      expect(results.length).not.toBe(0);
-      cb();
-    }).catch((e) => {
-      console.error('error occurred.:', e);
-      cb();
-    });
+const API_KEY = '123456';
+const API_SECRET = 'abcdef';
+const api = new OoyalaApi(API_KEY, API_SECRET);
+
+test('get', t => {
+  return api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
+  .then(results => {
+    t.not(results, null);
+    t.not(results.length, 0);
+    const requestURL = 'http://api.ooyala.com/v2/assets?where=labels%2BINCLUDES%2B%27Music%27';
+    const params = {method: 'GET', body: ''};
+    t.true(mockFetch.calledWithMatch(requestURL, params));
+  }).catch(err => {
+    t.fail(`error occurred.: ${err.trace}`);
   });
 });
