@@ -5,7 +5,23 @@ const proxyquire = require('proxyquire');
 const mock = {
   fetch(url, params) {
     console.log(`[mockFetch] url=${url}, params=${params}`);
-    return Promise.resolve({status: 200, statusText: 'OK', json: mock.json});
+    return Promise.resolve({
+      status: 200,
+      statusText: 'OK',
+      headers: {
+        get: h => {
+          const header = h.toLowerCase();
+          if (header === 'x-ratelimit-credits') {
+            return 2;
+          }
+          if (header === 'x-ratelimit-reset') {
+            return 3;
+          }
+          return 0;
+        }
+      },
+      json: mock.json
+    });
   },
 
   json() {
