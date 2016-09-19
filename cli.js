@@ -3,7 +3,7 @@ const URL = require('url');
 const minimist = require('minimist');
 const debug = require('debug');
 const config = require('config');
-const pkg = require('../package.json');
+const pkg = require('./package.json');
 const OoyalaApi = require('./lib');
 
 const print = debug('oo');
