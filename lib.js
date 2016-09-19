@@ -174,7 +174,7 @@ class OoyalaApi {
         options.results = options.results.concat(body.items);
         if (body.next_page) {
           const {pathname, query} = URL.parse(body.next_page, true);
-          return this.request('GET', pathname, query, null, options);
+          return this.send('GET', pathname, query, null, options);
         }
         print(`Results: ${options.results.length} items`);
         return options.results;
