@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const querystring = require('querystring');
+const URL = require('url');
 const fetch = require('node-fetch');
 const debug = require('debug');
 const throughParallel = require('through2-parallel');
@@ -172,13 +173,8 @@ class OoyalaApi {
         print(`Already retrieved: ${options.results.length}, newly retrieved: ${body.items.length}`);
         options.results = options.results.concat(body.items);
         if (body.next_page) {
-          const [path, params] = body.next_page.split('?');
-          const paramsObj = {};
-          params.split('&').forEach(param => {
-            const [key, value] = param.split('=');
-            paramsObj[key] = value;
-          });
-          return this.request('GET', path, paramsObj, null, options);
+          const {pathname, query} = URL.parse(body.next_page, true);
+          return this.request('GET', pathname, query, null, options);
         }
         print(`Results: ${options.results.length} items`);
         return options.results;
