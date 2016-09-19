@@ -2,7 +2,9 @@ const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
+const requestURL = 'http://api.ooyala.com/v2/assets?where=labels%2BINCLUDES%2B%27Music%27';
 const mock = {
+  counter: 0,
   fetch(url, params) {
     console.log(`[mockFetch] url=${url}, params=${params}`);
     return Promise.resolve({
@@ -15,7 +17,7 @@ const mock = {
             return 2;
           }
           if (header === 'x-ratelimit-reset') {
-            return 3;
+            return 1;
           }
           return 0;
         }
@@ -25,6 +27,9 @@ const mock = {
   },
 
   json() {
+    if (mock.counter++ === 0) {
+      return Promise.resolve({items: [{}], next_page: requestURL});
+    }
     return Promise.resolve({items: [{}]});
   }
 };
@@ -42,7 +47,6 @@ test('get', t => {
   .then(results => {
     t.not(results, null);
     t.not(results.length, 0);
-    const requestURL = 'http://api.ooyala.com/v2/assets?where=labels%2BINCLUDES%2B%27Music%27';
     const params = {method: 'GET', body: ''};
     t.true(mockFetch.calledWithMatch(requestURL, params));
   }).catch(err => {
