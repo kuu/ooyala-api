@@ -170,8 +170,9 @@ class OoyalaApi {
       return options.recursive ? {items: []} : {};
     }).then(body => {
       if (options.recursive) {
-        print(`Already retrieved: ${options.results.length}, newly retrieved: ${body.items.length}`);
-        options.results = options.results.concat(body.items);
+        const list = body.items || body.results;
+        print(`Already retrieved: ${options.results.length}, newly retrieved: ${list.length}`);
+        options.results = options.results.concat(list);
         if (body.next_page) {
           const {pathname, query} = URL.parse(body.next_page, true);
           return this.send('GET', pathname, query, null, options);
