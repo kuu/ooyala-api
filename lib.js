@@ -140,6 +140,10 @@ class OoyalaApi {
   send(method, path, params = {}, body = {}, options = {}) {
     const bodyStr = body ? stringify(body) : '';
 
+    if (params === null) {
+      params = {};
+    }
+
     params.expires = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
     params.api_key = this.key;
     params.signature = this.sign(method, path, params, bodyStr);
