@@ -30,11 +30,9 @@
     "xo": "^0.16.0"
   },
   "scripts": {
-    "oo": "oo",
+    "oo": "node ./cli.js",
     "lint": "xo",
-    "test": "npm run lint && nsp check && ava --verbose",
-    "token": "oo token",
-    "sign": "oo sign"
+    "test": "npm run lint && nsp check && ava --verbose"
   },
   "engines": {
     "node": ">=6.0.0"

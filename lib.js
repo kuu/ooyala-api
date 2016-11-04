@@ -111,20 +111,20 @@ class OoyalaApi {
     return this.request('GET', path, params, null, options);
   }
 
-  post(path, params = {}, body = {}) {
-    return this.request('POST', path, params, body);
+  post(path, params = {}, body = {}, options = {}) {
+    return this.request('POST', path, params, body, options);
   }
 
-  put(path, params = {}, body = {}) {
-    return this.request('PUT', path, params, body);
+  put(path, params = {}, body = {}, options = {}) {
+    return this.request('PUT', path, params, body, options);
   }
 
-  delete(path, params = {}) {
-    return this.request('DELETE', path, params, null);
+  delete(path, params = {}, options = {}) {
+    return this.request('DELETE', path, params, null, options);
   }
 
-  patch(path, params = {}, body = {}) {
-    return this.request('PATCH', path, params, body);
+  patch(path, params = {}, body = {}, options = {}) {
+    return this.request('PATCH', path, params, body, options);
   }
 
   request(...params) {
@@ -137,26 +137,38 @@ class OoyalaApi {
     });
   }
 
-  send(method, path, params = {}, body = {}, options = {}) {
-    const bodyStr = body ? stringify(body) : '';
+  send(method, path, params = {}, bodyObj = {}, options = {}) {
+    let bodyToSend;
+
+    if (Buffer.isBuffer(bodyObj)) {
+      bodyToSend = bodyObj;
+    } else {
+      bodyToSend = bodyObj ? stringify(bodyObj) : '';
+    }
 
     if (params === null) {
       params = {};
     }
 
-    params.expires = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
-    params.api_key = this.key;
-    params.signature = this.sign(method, path, params, bodyStr);
+    let requestURL;
 
-    const requestURL = [
-      `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
-      querystring.stringify(params).replace(/'|\\'/g, '%27')
-    ].join('?');
+    if (options.requestURL) {
+      requestURL = options.requestURL;
+    } else {
+      params.expires = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
+      params.api_key = this.key;
+      params.signature = this.sign(method, path, params, bodyToSend);
+
+      requestURL = [
+        `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
+        querystring.stringify(params).replace(/'|\\'/g, '%27')
+      ].join('?');
+    }
 
     print(`[${method}] ${requestURL}
-    ${bodyStr}`);
+    ${Buffer.isBuffer(bodyToSend) ? `[Buffer length=${bodyToSend.length}]` : bodyToSend}`);
 
-    return fetch(requestURL, {method, body: bodyStr})
+    return fetch(requestURL, {method, body: bodyToSend, headers: options.headers})
     .then(res => {
       this.credits = parseRateLimit(res, 'Credits');
       print(`'X-RateLimit-Credits': ${this.credits}`);

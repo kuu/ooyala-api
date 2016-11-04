@@ -57,6 +57,8 @@ api.delete(`/v2/assets/${embedCode}`)
 | constructor | expirationTime | Integer | 86400   | TTL of the API call in seconds           |
 | constructor | concurrency    | Integer | 5       | Limits the number of concurrent API calls. The valid range is 1~10 |
 | get         | recursive      | Boolean | false   | If true, the library calls API recursively as long as  `next_page` is specified in the response |
+| get, post, put, delete, patch | headers      | Object | undefined   | If the object contains HTTP headers, the key-value pairs are used for the request. |
+| get, post, put, delete, patch | requestURL      | String | undefined   | If defined, the url is just used. No params are added internally. |
 
 ## CLI
 Please put config file(s) in your work directory.
@@ -72,7 +74,7 @@ Please put config file(s) in your work directory.
  }
 ```
 
-Currently, only two commands (`token` and `sign`) are supported.
+Currently, only three commands (`token`, `sign`, and `upload`) are supported.
 ```
 Usage:
     oo [options] command [parameters]
@@ -82,21 +84,24 @@ Options:
   -v, --version Print version
 
 Commands:
-  token           Generates Ooyala player token (OPT) request URL. Parameters: embedCode, [accountId]
-  sign            Generates signature based on given params (method, url, body)
+  token           Generates Ooyala player token (OPT) request URL. first param: embed code or comma-separated list of embed codes, optional params: [accountId]
+  sign            Generates signature based on given params. first param: url, optional params: [method, body]
+  upload          Uploads file(s). first param: local file path, optional params: [title, chunkSize]
 
-Parameters:
-  embedCode     Content id or a comma-separated list of content ids
-  accountId     Viewer's login id
+Optional parameters:
+  accountId     Viewer's login id (default = undefined)
   method        (GET | POST | PUT | DELETE | PATCH) default = GET
-  url           URL string (relative url)
-  body          Body string
+  body          Body string (default = '')
+  title         Title of the video (default = {file name})
+  chunkSize     Byte size of each chunk (default = 204800)
 
 Example:
   oo -v
-  oo token --embedCode xxxx
-  oo token --embedCode xxxx,yyyy --accountId david1203
-  oo sign --url /hoge?foo=bar
-  oo sign --url /hoge?foo=bar --body {"data": {"comment": "This is JSON"}}
-  oo sign --url /hoge?foo=bar --body {"data": {"comment": "This is JSON"}} --method PATCH
+  oo token embed_code
+  oo token embed_code1,embed_code2 --accountId david1203
+  oo sign /hoge?foo=bar
+  oo sign /hoge?foo=bar --body {"data": {"comment": "This is JSON"}}
+  oo sign /hoge?foo=bar --body {"data": {"comment": "This is JSON"}} --method PATCH
+  oo upload ./path/to/file --title "My video"
+  oo upload ./path/to/file --title "My video" --chunkSize 1024
 ```
