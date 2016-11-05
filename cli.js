@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 const minimist = require('minimist');
-const debug = require('debug');
 const config = require('config');
 const OoyalaApi = require('./lib');
 const constants = require('./constants');
 
-const print = debug('oo');
 const argv = minimist(process.argv.slice(2));
 
 if (!config.api) {
@@ -17,9 +15,9 @@ if (!config.api) {
 } else {
   const api = new OoyalaApi(config.api.key, config.api.secret, {expirationTime: config.api.period, concurrency: 6});
   try {
-    require(`./command/${argv._[0]}`)(api, argv._[1], argv);
+    require(`./command/${argv._[0]}`)(api, argv._.slice(1), argv);
   } catch (err) {
-    print(`${err.message} ${err.stack}`);
+    console.error(`${err.message} ${err.stack}`);
     console.info(constants.HELP_TEXT);
   }
 }

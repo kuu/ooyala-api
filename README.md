@@ -84,9 +84,14 @@ Options:
   -v, --version Print version
 
 Commands:
-  token           Generates Ooyala player token (OPT) request URL. first param: embed code or comma-separated list of embed codes, optional params: [accountId]
-  sign            Generates signature based on given params. first param: url, optional params: [method, body]
-  upload          Uploads file(s). first param: local file path, optional params: [title, chunkSize]
+  token           Generates Ooyala player token (OPT) request URL.
+  sign            Generates signature based on given params.
+  upload          Uploads file(s).
+
+Syntax:
+  token           embed-code(s) [accountId]
+  sign            url [method body]
+  upload          local-file-path(s) [title chunkSize] (if multiple files are specified, the title is suffixed by '- part n')
 
 Optional parameters:
   accountId     Viewer's login id (default = undefined)
@@ -98,10 +103,10 @@ Optional parameters:
 Example:
   oo -v
   oo token embed_code
-  oo token embed_code1,embed_code2 --accountId david1203
+  oo token embed_code1 embed_code2 --accountId david1203
   oo sign /hoge?foo=bar
   oo sign /hoge?foo=bar --body {"data": {"comment": "This is JSON"}}
   oo sign /hoge?foo=bar --body {"data": {"comment": "This is JSON"}} --method PATCH
   oo upload ./path/to/file --title "My video"
-  oo upload ./path/to/file --title "My video" --chunkSize 1024
+  oo upload ./path/to/file1 ./path/to/file2 --title "My videos" --chunkSize 1024
 ```
