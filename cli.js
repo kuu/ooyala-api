@@ -15,7 +15,7 @@ if (!config.api) {
 } else {
   const api = new OoyalaApi(config.api.key, config.api.secret, {expirationTime: config.api.period, concurrency: 6});
   try {
-    require(`./command/${argv._[0]}`)(api, argv._[1], argv);
+    require(`./command/${argv._[0]}`)(api, argv._.slice(1), argv);
   } catch (err) {
     console.error(`${err.message} ${err.stack}`);
     console.info(constants.HELP_TEXT);

@@ -4,10 +4,11 @@ const utils = require('../utils');
 
 const print = debug('oo');
 
-function printSignature(api, url, argv) {
-  if (!url) {
+function printSignature(api, parameters, argv) {
+  if (parameters.length === 0) {
     utils.THROW(new Error('URL is not specified.'));
   }
+  const url = parameters[0];
   argv.url = url;
   const {method, path, params, body} = parseSignArgs(argv);
   print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
