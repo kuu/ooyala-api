@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const debug = require('debug');
-const constants = require('../constants');
+const utils = require('../utils');
 
 const print = debug('oo');
 const baseDir = path.join(__dirname, '..');
@@ -10,8 +10,7 @@ function uploadFile(api, localPath, argv) {
   const absolutePath = path.join(baseDir, localPath);
 
   if (fs.statSync(absolutePath).isFile() === false) {
-    console.info(constants.HELP_TEXT);
-    return;
+    utils.THROW(new Error(`Invalid path: ${localPath}`));
   }
 
   const fileName = path.basename(absolutePath);
@@ -22,8 +21,7 @@ function uploadFile(api, localPath, argv) {
 
   fs.readFile(absolutePath, (err, buf) => {
     if (err) {
-      console.error(`${err.message} ${err.stack}`);
-      return;
+      utils.THROW(err);
     }
 
     let embedCode;
@@ -58,7 +56,7 @@ function uploadFile(api, localPath, argv) {
       return api.put(`/v2/assets/${embedCode}/upload_status`, {}, {status: 'uploaded'});
     })
     .then(() => {
-      console.log(`All chunks[${buf.length}] sent. embed_code="${embedCode}"`);
+      console.log(`All chunks (total bytes=${buf.length}) sent. embed_code="${embedCode}"`);
     });
   });
 }

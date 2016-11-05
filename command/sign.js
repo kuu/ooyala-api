@@ -1,18 +1,17 @@
 const URL = require('url');
 const debug = require('debug');
-const constants = require('../constants');
+const utils = require('../utils');
 
 const print = debug('oo');
 
 function printSignature(api, url, argv) {
-  if (url) {
-    argv.url = url;
-    const {method, path, params, body} = parseSignArgs(argv);
-    print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
-    console.log(api.sign(method, path, params, body));
-  } else {
-    console.info(constants.HELP_TEXT);
+  if (!url) {
+    utils.THROW(new Error('URL is not specified.'));
   }
+  argv.url = url;
+  const {method, path, params, body} = parseSignArgs(argv);
+  print(`sign: method='${method}' path='${path}' params='${JSON.stringify(params)}' method='${method}' body='${body}'`);
+  console.log(api.sign(method, path, params, body));
 }
 
 function parseSignArgs({method, url, body}) {
