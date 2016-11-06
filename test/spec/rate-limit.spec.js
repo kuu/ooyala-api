@@ -5,8 +5,8 @@ const proxyquire = require('proxyquire');
 const CONCURRENCY = 3;
 const mock = {
   counter: 0,
-  fetch(url, params) {
-    console.log(`[mockFetch] url=${url}, params=${params}`);
+  fetch() {
+    // console.log(`[mockFetch] url=${url}, params=${params}`);
     const credits = CONCURRENCY - (mock.counter < CONCURRENCY ? mock.counter++ : (mock.counter++ % 2));
     return Promise.resolve({
       status: 200,
@@ -50,7 +50,7 @@ test('get', t => {
       const params = {method: 'GET', body: ''};
       t.true(mockFetch.calledWithMatch(requestURL, params));
     }).catch(err => {
-      t.fail(`error occurred.: ${err.trace}`);
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
     });
   }));
 });

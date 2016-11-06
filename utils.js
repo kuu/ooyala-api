@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const utils = {
   THROW(err) {
     throw err;
@@ -15,6 +17,18 @@ const utils = {
       ret = ret.substring(0, ret.length - 1);
     }
     return ret;
+  },
+
+  readFile(path, options) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(path, options, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
   }
 };
 

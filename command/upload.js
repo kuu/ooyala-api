@@ -23,27 +23,39 @@ function uploadFiles(api, params, argv) {
     utils.THROW(new Error('File is not specified.'));
   }
   const chunkSize = argv.chunkSize || 204800;
-  params.forEach((file, i) => {
+  const errors = [];
+  return Promise.all(params.map((file, i) => {
     if (fs.statSync(file).isFile() === false) {
       utils.THROW(new Error(`Invalid path: ${file}`));
     }
     const fileName = path.basename(file);
     const title = getTitle(argv, fileName, i);
-    uploadFile(api, file, title, fileName, chunkSize);
+    return uploadFile(api, file, title, fileName, chunkSize)
+    .catch(err => {
+      errors.push(err);
+      return null;
+    });
+  }))
+  .then(results => {
+    if (results.includes(null)) {
+      return [
+        errors.map(err => {
+          return `Error: ${err.message} ${err.stack}`;
+        }).join('\n'),
+        results.join('\n')
+      ].join('\n');
+    }
+    return results.join('\n');
   });
 }
 
 function uploadFile(api, file, title, fileName, chunkSize) {
   print(`upload: path='${file}' chunkSize='${chunkSize}' title='${title}'`);
 
-  fs.readFile(file, (err, buf) => {
-    if (err) {
-      utils.THROW(err);
-    }
-
+  return utils.readFile(file).then(buf => {
+    const errors = [];
     let embedCode;
-
-    api.post('/v2/assets', {}, {
+    return api.post('/v2/assets', {}, {
       name: title,
       file_name: fileName,
       asset_type: 'video',
@@ -61,19 +73,21 @@ function uploadFile(api, file, title, fileName, chunkSize) {
         print(`[PUT] offset=${offset} length=${length} ${url}`);
         return api.put(null, {}, buf.slice(offset, offset + length), {requestURL: url, headers: {'Content-Length': length}})
         .catch(err => {
-          console.error(`${err.message} ${err.stack}`);
+          errors.push(err);
           return null;
         });
       }));
     })
     .then(results => {
       if (results.includes(null)) {
-        return new Error('Some chunks failed');
+        utils.THROW(new Error(errors.map(err => {
+          return `Error: ${err.message} ${err.stack}`;
+        }).join('\n')));
       }
       return api.put(`/v2/assets/${embedCode}/upload_status`, {}, {status: 'uploaded'});
     })
     .then(() => {
-      console.log(`All chunks (total bytes=${buf.length}) sent. embed_code="${embedCode}"`);
+      return `Success: ${file} (total bytes=${buf.length}) embed_code="${embedCode}"`;
     });
   });
 }

@@ -5,8 +5,8 @@ const proxyquire = require('proxyquire');
 const requestURL = 'http://api.ooyala.com/v2/assets?where=labels%2BINCLUDES%2B%27Music%27';
 const mock = {
   counter: 0,
-  fetch(url, params) {
-    console.log(`[mockFetch] url=${url}, params=${params}`);
+  fetch() {
+    // console.log(`[mockFetch] url=${url}, params=${params}`);
     return Promise.resolve({
       status: 200,
       statusText: 'OK',
@@ -50,6 +50,6 @@ test('get', t => {
     const params = {method: 'GET', body: ''};
     t.true(mockFetch.calledWithMatch(requestURL, params));
   }).catch(err => {
-    t.fail(`error occurred.: ${err.trace}`);
+    t.fail(`error occurred: ${err.message} ${err.trace}`);
   });
 });
