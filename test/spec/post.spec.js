@@ -3,8 +3,8 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
 const mock = {
-  fetch(url, params) {
-    console.log(`[mockFetch] url=${url}, params=${params}`);
+  fetch() {
+    // console.log(`[mockFetch] url=${url}, params=${params}`);
     return Promise.resolve({
       status: 200,
       statusText: 'OK',
@@ -49,6 +49,6 @@ test('post', t => {
     const params = {method: 'POST', body: JSON.stringify(body)};
     t.true(mockFetch.calledWithMatch(requestURL, params));
   }).catch(err => {
-    t.fail(`error occurred.: ${err.trace}`);
+    t.fail(`error occurred: ${err.message} ${err.trace}`);
   });
 });
