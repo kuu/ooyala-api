@@ -73,7 +73,6 @@ Please put config file(s) in your work directory.
  }
 ```
 
-Currently, only three commands (`token`, `sign`, and `upload`) are supported.
 ```
 Usage:
     oo [options] command [parameters]
@@ -86,11 +85,13 @@ Commands:
   token           Generates Ooyala player token (OPT) request URL.
   sign            Generates a signature based on given params.
   upload          Uploads file(s).
+  remote          Creates a remote asset
 
 Syntax:
   oo token embed-code(s) [accountId]
   oo sign url [method body]
   oo upload local-file-path(s) [title chunkSize]
+  oo remote asset-name [dash hls hds]
 
 Example:
   oo -v
@@ -101,6 +102,7 @@ Example:
   oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}' --method PATCH
   oo upload ./path/to/file --title "My video"
   oo upload ./path/to/files/*.mp4 --title "My videos" --chunkSize 1024
+  oo remote "My remote asset" --dash http://x.jp/a.mpd --hls http://x.jp/a.m3u8 --hds http://x.jp/a.f4m
 
 Parameters:
   accountId     Viewer's login id (default = undefined)
@@ -108,4 +110,8 @@ Parameters:
   body          Body string (default = '')
   title         Title of the video (default = {file name} if multiple files are specified, the title is suffixed by '- part n')
   chunkSize     Byte size of each chunk (default = 204800)
+  dash          Remote asset URL for MPEG-DASH
+  hls           Remote asset URL for HTTP Live Streaming
+  hds           Remote asset URL for HTTP Dynamic Streaming
+
 ```

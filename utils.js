@@ -29,6 +29,23 @@ const utils = {
         }
       });
     });
+  },
+
+  strip(url) {
+    ['expires=', 'signature='].forEach(pattern => {
+      const start = url.indexOf(pattern);
+      if (start !== -1) {
+        let end = url.indexOf('&', start) + 1;
+        if (end === 0) {
+          end = url.length;
+        }
+        url = url.replace(url.slice(start, end), '');
+      }
+    });
+    if (url.lastIndexOf('&') === url.length - 1) {
+      url = url.slice(0, -1);
+    }
+    return url;
   }
 };
 

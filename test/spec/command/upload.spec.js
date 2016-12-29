@@ -62,14 +62,16 @@ const api = new OoyalaApi(API_KEY, API_SECRET);
 
 // oo upload ./path/to/file --title "My video" --chunkSize 1
 const EXPECTED = 'Success: ./path/to/file (total bytes=3) embed_code="xxx"';
-test('upload', t => {
+test.cb('upload', t => {
   const params = ['./path/to/file'];
   const argv = {title: 'My video', chunkSize: 1};
   upload(api, params, argv)
   .then(result => {
     t.is(result, EXPECTED);
+    t.end();
   })
   .catch(err => {
     t.fail(`error occurred: ${err.message} ${err.trace}`);
+    t.end();
   });
 });
