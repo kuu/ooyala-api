@@ -29,6 +29,10 @@ function createRemoteAsset(api, params, argv) {
     urls.iphone = hls;
   }
 
+  if (!urls.flash) {
+    urls.flash = dash || hls;
+  }
+
   const assetData = {
     name,
     asset_type: 'remote_asset',
