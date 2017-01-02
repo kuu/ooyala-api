@@ -1,6 +1,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const utils = require('../../utils');
 
 const mock = {
   fetch() {
@@ -33,7 +34,7 @@ const FLASH_URL = 'http://flash_url.com';
 
 // let embedCode;
 
-test('post', t => {
+test('post', async t => {
   const body = {
     name: `test ${Date()}`,
     asset_type: 'remote_asset',
@@ -43,12 +44,12 @@ test('post', t => {
       iphone: 'http://iphone_url.com'
     }
   };
-  return api.post('/v2/assets', {}, body).then(result => {
-    t.not(result, null);
-    const requestURL = 'http://api.ooyala.com/v2/assets';
-    const params = {method: 'POST', body: JSON.stringify(body)};
-    t.true(mockFetch.calledWithMatch(requestURL, params));
-  }).catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-  });
+  const result = await api.post('/v2/assets', {}, body);
+  t.not(result, null);
+  const requestURL = 'http://api.ooyala.com/v2/assets';
+  const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
+  t.true(mockFetch.calledOnce);
+  const args = mockFetch.getCall(0).args;
+  t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
+  t.deepEqual(args[1], params);
 });

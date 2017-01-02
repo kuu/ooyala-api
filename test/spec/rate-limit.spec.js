@@ -1,6 +1,7 @@
 const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const utils = require('../../utils');
 
 const CONCURRENCY = 3;
 const mock = {
@@ -40,17 +41,15 @@ const API_KEY = '123456';
 const API_SECRET = 'abcdef';
 const api = new OoyalaApi(API_KEY, API_SECRET, {concurrency: 3});
 
-test('get', t => {
-  return Promise.all([0, 1, 2, 3, 4, 5, 6, 7].map(item => {
-    return api.get(`/v2/assets/${item}`, {}, {recursive: true})
-    .then(results => {
-      t.not(results, null);
-      t.not(results.length, 0);
-      const requestURL = `http://api.ooyala.com/v2/assets/${item}`;
-      const params = {method: 'GET', body: ''};
-      t.true(mockFetch.calledWithMatch(requestURL, params));
-    }).catch(err => {
-      t.fail(`error occurred: ${err.message} ${err.trace}`);
-    });
-  }));
+test('rate-limit', async t => {
+  for (let i = 0; i < 8; i++) {
+    const results = await api.get(`/v2/assets/${i}`, {}, {recursive: true});
+    t.not(results, null);
+    t.not(results.length, 0);
+    const requestURL = `http://api.ooyala.com/v2/assets/${i}`;
+    const params = {method: 'GET', body: '', headers: undefined};
+    const args = mockFetch.getCall(i).args;
+    t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
+    t.deepEqual(args[1], params);
+  }
 });

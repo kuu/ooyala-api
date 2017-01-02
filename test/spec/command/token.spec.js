@@ -7,7 +7,7 @@ const OoyalaApi = rewire('../../../lib');
 
 class FakeDate extends Date {
   static now() {
-    console.log(`FakeDate.now() is called~`);
+    // console.log(`FakeDate.now() is called~`);
     return 1478482181000;
   }
 }
@@ -29,7 +29,7 @@ test.cb('token-1', t => {
   const argv = {};
   token(api, params, argv)
   .then(result => {
-    t.is(utils.strip(result), EXPECTED_1);
+    t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_1);
     t.end();
   })
   .catch(err => {
@@ -45,7 +45,7 @@ test.cb('token-2', t => {
   const argv = {accountId: 'david1203'};
   token(api, params, argv)
   .then(result => {
-    t.is(utils.strip(result), EXPECTED_2);
+    t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_2);
     t.end();
   })
   .catch(err => {

@@ -43,7 +43,8 @@
     "space": true,
     "rules": {
       "camelcase": 0,
-      "babel/new-cap": 0
+      "new-cap": 0,
+      "import/no-dynamic-require": 0
     }
   }
 }

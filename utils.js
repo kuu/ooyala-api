@@ -31,8 +31,18 @@ const utils = {
     });
   },
 
-  strip(url) {
-    ['expires=', 'signature='].forEach(pattern => {
+  removeTailChar(str, charToRemove) {
+    charToRemove.forEach(char => {
+      if (str.lastIndexOf(char) === str.length - 1) {
+        str = str.slice(0, -1);
+      }
+    });
+    return str;
+  },
+
+  strip(url, queriesToRemove) {
+    const queries = queriesToRemove.map(query => `${query}=`);
+    queries.forEach(pattern => {
       const start = url.indexOf(pattern);
       if (start !== -1) {
         let end = url.indexOf('&', start) + 1;
@@ -42,10 +52,7 @@ const utils = {
         url = url.replace(url.slice(start, end), '');
       }
     });
-    if (url.lastIndexOf('&') === url.length - 1) {
-      url = url.slice(0, -1);
-    }
-    return url;
+    return this.removeTailChar(url, ['&', '?']);
   }
 };
 
