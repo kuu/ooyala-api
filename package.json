@@ -23,12 +23,12 @@
     "through2-parallel": "^0.1.3"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
+    "ava": "^0.17.0",
     "nsp": "^2.6.1",
     "proxyquire": "^1.7.10",
     "rewire": "^2.5.2",
     "sinon": "^1.17.5",
-    "xo": "^0.16.0"
+    "xo": "^0.17.1"
   },
   "scripts": {
     "oo": "node ./cli.js",
