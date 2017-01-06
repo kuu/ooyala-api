@@ -1,5 +1,6 @@
 [![NPM version](https://badge.fury.io/js/ooyala-api.png)](https://badge.fury.io/js/ooyala-api)
 [![Build Status](https://travis-ci.org/kuu/ooyala-api.svg?branch=master)](https://travis-ci.org/kuu/ooyala-api)
+[![Coverage Status](https://coveralls.io/repos/kuu/ooyala-api/badge.png?branch=master)](https://coveralls.io/r/kuu/ooyala-api?branch=master)
 [![Dependency Status](https://gemnasium.com/kuu/ooyala-api.png)](https://gemnasium.com/kuu/ooyala-api)
 
 # ooyala-api
