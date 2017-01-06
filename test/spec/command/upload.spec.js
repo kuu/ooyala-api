@@ -52,8 +52,8 @@ const mockFetch = sinon.spy(dummyFetch, 'fetch');
 const mockReadFile = sinon.spy(dummyReadFile, 'readFile');
 const mockStatSync = sinon.spy(dummyStatSync, 'statSync');
 
-const OoyalaApi = proxyquire('../../../lib', {'node-fetch': mockFetch});
 proxyquire('../../../utils', {fs: {readFile: mockReadFile}});
+const OoyalaApi = proxyquire('../../../lib', {'node-fetch': mockFetch});
 const upload = proxyquire('../../../command/upload', {fs: {statSync: mockStatSync}});
 
 const API_KEY = '123456';
