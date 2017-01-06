@@ -24,7 +24,9 @@
   },
   "devDependencies": {
     "ava": "^0.17.0",
+    "coveralls": "^2.11.15",
     "nsp": "^2.6.1",
+    "nyc": "^10.0.0",
     "proxyquire": "^1.7.10",
     "rewire": "^2.5.2",
     "sinon": "^1.17.5",
@@ -33,7 +35,8 @@
   "scripts": {
     "oo": "node ./cli.js",
     "lint": "xo",
-    "test": "npm run lint && nsp check && ava --verbose"
+    "test": "npm run lint && nsp check && ava --verbose",
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "engines": {
     "node": ">=6.0.0"

@@ -34,3 +34,4 @@ node_modules
 
 config
 .node-version
+.nyc_output
