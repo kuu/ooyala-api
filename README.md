@@ -14,21 +14,25 @@ Ooyala API client library and CLI for Node.js
 ```js
 const OoyalaApi = require('ooyala-api');
 
-const api = new OoyalaApi('{Your Ooyala API Key}', '{Your Ooyala API Secret}', {concurrency: 6});
+const api = new OoyalaApi('Your Ooyala API Key', 'Your Ooyala API Secret', {concurrency: 6});
 const embedCode = 'Content ID';
 
 // GET
 api.get(`/v2/assets/${embedCode}`)
 .then((body) => {
   // JSON object
-  console.log(body);
+})
+.catch((err) => {
+  // Error response
 });
 
 // GET (with params + pagination)
 api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
 .then((items) => {
   // All items in an array (recursive calls will be done internally)
-  console.log(items);
+})
+.catch((err) => {
+  // Error response
 });
 
 // POST
@@ -40,15 +44,10 @@ api.post('/v2/assets', {}, {
     'flash': FLASH_URL,
     'iphone': IPHONE_URL
   }
-}).then((result) => {
-  console.log(result);
-});
+}).then((body) => {});
 
 // DELETE
-api.delete(`/v2/assets/${embedCode}`)
-.then((result) => {
-  console.log(result);
-});
+api.delete(`/v2/assets/${embedCode}`).then((body) => {});
 ```
 
 ### `options`
