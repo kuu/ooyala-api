@@ -4,6 +4,7 @@ const URL = require('url');
 const fetch = require('node-fetch');
 const debug = require('debug');
 const throughParallel = require('through2-parallel');
+const utils = require('./utils');
 
 const API_SERVER = 'api.ooyala.com';
 const TOKEN_SERVER = 'player.ooyala.com';
@@ -178,12 +179,11 @@ class OoyalaApi {
       } else {
         this.secondsToWait = 0;
       }
-
       print(`${res.status} ${res.statusText}`);
-      if (res.status === 200) {
-        return res.json();
+      if (res.status >= 200 && res.status < 300) {
+        return res.json().catch(() => Promise.resolve(options.recursive ? {items: []} : {}));
       }
-      return options.recursive ? {items: []} : {};
+      utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
     }).then(body => {
       if (options.recursive) {
         const list = body.items || body.results;
