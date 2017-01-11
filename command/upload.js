@@ -23,6 +23,7 @@ function uploadFiles(api, params, argv) {
     utils.THROW(new Error('File is not specified.'));
   }
   const chunkSize = argv.chunkSize || 204800;
+  const profile = argv.profile;
   const errors = [];
   return Promise.all(params.map((file, i) => {
     if (fs.statSync(file).isFile() === false) {
@@ -30,7 +31,7 @@ function uploadFiles(api, params, argv) {
     }
     const fileName = path.basename(file);
     const title = getTitle(argv, fileName, i);
-    return uploadFile(api, file, title, fileName, chunkSize)
+    return uploadFile(api, file, title, fileName, chunkSize, profile)
     .catch(err => {
       errors.push(err);
       return null;
@@ -49,7 +50,7 @@ function uploadFiles(api, params, argv) {
   });
 }
 
-function uploadFile(api, file, title, fileName, chunkSize) {
+function uploadFile(api, file, title, fileName, chunkSize, profile) {
   print(`upload: path='${file}' chunkSize='${chunkSize}' title='${title}'`);
 
   return utils.readFile(file).then(buf => {
@@ -83,6 +84,9 @@ function uploadFile(api, file, title, fileName, chunkSize) {
         utils.THROW(new Error(errors.map(err => {
           return `Error: ${err.message} ${err.stack}`;
         }).join('\n')));
+      }
+      if (profile) {
+        return api.post(`/v2/assets/${embedCode}/process`, {}, {initiation_type: 'original_ingest', processing_profile_id: profile});
       }
       return api.put(`/v2/assets/${embedCode}/upload_status`, {}, {status: 'uploaded'});
     })
