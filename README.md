@@ -53,6 +53,7 @@ api.delete(`/v2/assets/${embedCode}`).then((body) => {});
 ### `options`
 | API         | Option Name    | Type    | Default | Meaning                                  |
 | ----------- | -------------- |:-------:|:-------:| :----------------------------------------|
+| constructor | subdomain      | String | "api"   | Will be used to construct the destination server's host name. (default=api.ooyala.com) |
 | constructor | secure         | Boolean | false   | If true, the library sends https request |
 | constructor | expirationTime | Integer | 86400   | TTL of the API call in seconds           |
 | constructor | concurrency    | Integer | 5       | Limits the number of concurrent API calls. The valid range is 1~10 |

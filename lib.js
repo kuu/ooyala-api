@@ -6,7 +6,7 @@ const debug = require('debug');
 const throughParallel = require('through2-parallel');
 const utils = require('./utils');
 
-const API_SERVER = 'api.ooyala.com';
+const DEFAULT_API_SERVER = 'api.ooyala.com';
 const TOKEN_SERVER = 'player.ooyala.com';
 const DEFAULT_CONCURRENCY = 5;
 const MAX_CONCURRENCY = 10;
@@ -93,6 +93,7 @@ class OoyalaApi {
     this.secure = Boolean(options.secure);
     this.expirationTime = Math.floor(options.expirationTime || (24 * 60 * 60));
     this.concurrency = Math.min(options.concurrency || DEFAULT_CONCURRENCY, MAX_CONCURRENCY);
+    this.destination = options.subdomain ? `${options.subdomain}.ooyala.com` : DEFAULT_API_SERVER;
     this.credits = MAX_CONCURRENCY;
     this.secondsToWait = 0;
     this.sequencialStream = new ParallelStream(1, this);
@@ -161,7 +162,7 @@ class OoyalaApi {
       params.signature = this.sign(method, path, params, bodyToSend);
 
       requestURL = [
-        `${this.secure ? 'https' : 'http'}://${API_SERVER}${path}`,
+        `${this.secure ? 'https' : 'http'}://${this.destination}${path}`,
         querystring.stringify(params).replace(/'|\\'/g, '%27')
       ].join('?');
     }
