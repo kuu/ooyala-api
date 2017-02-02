@@ -99,7 +99,7 @@ function pushValue(obj, propName, value) {
   obj[propName] = value;
 }
 
-function restore(obj, propName) {
+function restoreValue(obj, propName) {
   const savePropName = `original-${propName}`;
   const stack = obj[savePropName];
   let value;
@@ -178,6 +178,16 @@ class OoyalaApi {
     });
   }
 
+  push(options) {
+    pushValue(this, 'destination', options.subdomain ? `${options.subdomain}.ooyala.com` : this.destination);
+    pushValue(this, 'secure', utils.hasOwnProp(options, 'secure') ? options.secure : this.secure);
+  }
+
+  restore() {
+    restoreValue(this, 'destination');
+    restoreValue(this, 'secure');
+  }
+
   send(method, path, params = {}, bodyObj = {}, options = {}) {
     let bodyToSend;
 
@@ -193,8 +203,7 @@ class OoyalaApi {
 
     let requestURL;
 
-    pushValue(this, 'destination', options.subdomain ? `${options.subdomain}.ooyala.com` : this.destination);
-    pushValue(this, 'secure', utils.hasOwnProp(options, 'secure') ? options.secure : this.secure);
+    this.push(options);
 
     if (options.requestURL) {
       requestURL = options.requestURL;
@@ -244,12 +253,13 @@ class OoyalaApi {
       res.text().then(msg => print(`Error: ${res.status} ${res.statusText} ${msg}`));
       utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
     }).then(body => {
+      this.restore();
       if (options.accountId) {
         const token = body.account_token;
         options.accountId = null;
         print(`Account token: ${token}`);
-        method = restore(options, 'method');
-        params = restore(options, 'params');
+        method = restoreValue(options, 'method');
+        params = restoreValue(options, 'params');
         params.account_token = token;
         return this.send(method, path, params, bodyObj, options);
       }
@@ -264,8 +274,7 @@ class OoyalaApi {
         print(`Results: ${options.results.length} items`);
         return options.results;
       }
-      restore(this, 'destination');
-      restore(this, 'secure');
+
       print(body);
       return body;
     });
