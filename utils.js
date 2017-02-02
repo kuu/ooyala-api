@@ -53,6 +53,10 @@ const utils = {
       }
     });
     return this.removeTailChar(url, ['&', '?']);
+  },
+
+  hasOwnProp(obj, propName) {
+    return Object.hasOwnProperty.call(obj, propName);
   }
 };
 

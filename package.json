@@ -16,7 +16,7 @@
   "author": "Kuu Miyazaki",
   "license": "MIT",
   "dependencies": {
-    "config": "^1.24.0",
+    "config": "^1.25.1",
     "debug": "^2.6.0",
     "minimist": "^1.2.0",
     "node-fetch": "^1.6.3",
@@ -27,7 +27,7 @@
     "coveralls": "^2.11.15",
     "nsp": "^2.6.2",
     "nyc": "^10.1.2",
-    "proxyquire": "^1.7.10",
+    "proxyquire": "^1.7.11",
     "rewire": "^2.5.2",
     "sinon": "^1.17.7",
     "xo": "^0.17.1"
@@ -47,6 +47,7 @@
     "rules": {
       "camelcase": 0,
       "new-cap": 0,
+      "no-return-assign": 0,
       "import/no-dynamic-require": 0
     }
   }
