@@ -2,7 +2,7 @@ const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function createResponse(status, statusText, json) {
+function createResponse(status, statusText, json, text) {
   return {
     status,
     statusText,
@@ -18,7 +18,8 @@ function createResponse(status, statusText, json) {
         return 0;
       }
     },
-    json
+    json,
+    text
   };
 }
 
@@ -46,11 +47,15 @@ const mock = {
   fetch() {
     // console.log(`[mockFetch] url=${url}, params=${params}`);
     const res = responses[mock.counter++];
-    return Promise.resolve(createResponse(res.status, res.statusText, mock.json));
+    return Promise.resolve(createResponse(res.status, res.statusText, mock.json, mock.text));
   },
 
   json() {
     return Promise.reject();
+  },
+
+  text() {
+    return Promise.resolve(`Error #${this.counter}`);
   }
 };
 

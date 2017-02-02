@@ -57,9 +57,13 @@ api.delete(`/v2/assets/${embedCode}`).then((body) => {});
 | constructor | secure         | Boolean | false   | If true, the library sends https request |
 | constructor | expirationTime | Integer | 86400   | TTL of the API call in seconds           |
 | constructor | concurrency    | Integer | 5       | Limits the number of concurrent API calls. The valid range is 1~10 |
+| constructor | accountSecret  | String | ""       | Account Token API's secret key |
 | get         | recursive      | Boolean | false   | If true, the library calls API recursively as long as  `next_page` is specified in the response |
 | get, post, put, delete, patch | headers      | Object | undefined   | If the object contains HTTP headers, the key-value pairs are used for the request. |
 | get, post, put, delete, patch | requestURL      | String | undefined   | If defined, the url is just used. No params are added internally. |
+| get, post, put, delete, patch | accountId      | String | undefined   | If defined, Account Token API will be called with the specified `accountId` before the main API call. And then its return value (`account_token`) will be used for the main API call. |
+| get, post, put, delete, patch | subdomain      | String | (the value specified at constructor)  | Overrides the value specified at constructor. |
+| get, post, put, delete, patch | secure         | Boolean | (the value specified at constructor) | Overrides the value specified at constructor. |
 
 ## CLI
 Please put config file(s) in your work directory.

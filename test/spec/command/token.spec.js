@@ -23,7 +23,7 @@ const API_SECRET = 'abcdef';
 const api = new OoyalaApi(API_KEY, API_SECRET);
 
 // oo token embed_code
-const EXPECTED_1 = 'http://player.ooyala.com/sas/embed_token//embed_code?api_key=123456';
+const EXPECTED_1 = `http://player.ooyala.com/sas/embed_token/${API_KEY}/embed_code?api_key=123456`;
 test.cb('token-1', t => {
   const params = ['embed_code'];
   const argv = {};
@@ -39,7 +39,7 @@ test.cb('token-1', t => {
 });
 
 // oo token embed_code1 embed_code2 --accountId david1203
-const EXPECTED_2 = 'http://player.ooyala.com/sas/embed_token//embed_code1,embed_code2?api_key=123456&account_id=david1203';
+const EXPECTED_2 = `http://player.ooyala.com/sas/embed_token/${API_KEY}/embed_code1,embed_code2?api_key=${API_KEY}&account_id=david1203`;
 test.cb('token-2', t => {
   const params = ['embed_code1', 'embed_code2'];
   const argv = {accountId: 'david1203'};

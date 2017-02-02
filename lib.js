@@ -71,7 +71,7 @@ function serialize(params, delimiter, sort) {
 function getPcode(apiKey) {
   const idx = apiKey.lastIndexOf('.');
   if (idx === -1) {
-    return '';
+    return apiKey;
   }
   return apiKey.substring(0, idx);
 }
@@ -86,10 +86,41 @@ function stringify(data) {
   return str;
 }
 
+function pushValue(obj, propName, value) {
+  if (!utils.hasOwnProp(obj, propName)) {
+    return obj[propName] = value;
+  }
+  const savePropName = `original-${propName}`;
+  let stack = obj[savePropName];
+  if (!stack) {
+    stack = obj[savePropName] = [];
+  }
+  stack.push(obj[propName]);
+  obj[propName] = value;
+}
+
+function restore(obj, propName) {
+  const savePropName = `original-${propName}`;
+  const stack = obj[savePropName];
+  let value;
+  if (stack && stack.length > 0) {
+    obj[propName] = stack.pop();
+    if (stack.length === 0) {
+      obj[savePropName] = null;
+    }
+    value = obj[propName];
+  } else {
+    value = obj[propName];
+    obj[propName] = null;
+  }
+  return value;
+}
+
 class OoyalaApi {
   constructor(key, secret, options = {}) {
     this.key = key;
     this.secret = secret;
+    this.accountSecret = options.accountSecret || '';
     this.secure = Boolean(options.secure);
     this.expirationTime = Math.floor(options.expirationTime || (24 * 60 * 60));
     this.concurrency = Math.min(options.concurrency || DEFAULT_CONCURRENCY, MAX_CONCURRENCY);
@@ -104,6 +135,14 @@ class OoyalaApi {
     const sha256 = crypto.createHash('sha256');
     sha256.update([this.secret, method, path, serialize(params, '', true), body].join(''));
     return sha256.digest('base64').slice(0, 43);
+  }
+
+  signWithUid(uid, timestamp) {
+    const secret = Buffer.from(this.accountSecret, 'base64');
+    const hmacSha1 = crypto.createHmac('sha1', secret);
+    const baseString = `${timestamp}_${uid}`;
+    hmacSha1.update(Buffer.from(baseString, 'utf8'));
+    return hmacSha1.digest('base64');
   }
 
   get(path, params = {}, options = {}) {
@@ -154,8 +193,26 @@ class OoyalaApi {
 
     let requestURL;
 
+    pushValue(this, 'destination', options.subdomain ? `${options.subdomain}.ooyala.com` : this.destination);
+    pushValue(this, 'secure', utils.hasOwnProp(options, 'secure') ? options.secure : this.secure);
+
     if (options.requestURL) {
       requestURL = options.requestURL;
+    } else if (options.accountId) {
+      const [uid, signatureTimestamp] = [options.accountId, options.signatureTimestamp || Math.floor(Date.now() / 1000) + 60];
+      options.uid = options.signatureTimestamp = null;
+      pushValue(options, 'method', method);
+      method = 'POST';
+      pushValue(options, 'params', params);
+      params = {
+        uid,
+        signatureTimestamp,
+        UIDSignature: this.signWithUid(uid, signatureTimestamp)
+      };
+      requestURL = [
+        `https://player.ooyala.com/authentication/v1/providers/${getPcode(this.key)}/gigya`,
+        querystring.stringify(params).replace(/'|\\'/g, '%27')
+      ].join('?');
     } else {
       params.expires = params.expires || Math.floor(Date.now() / 1000) + this.expirationTime;
       params.api_key = this.key;
@@ -184,8 +241,18 @@ class OoyalaApi {
       if (res.status >= 200 && res.status < 300) {
         return res.json().catch(() => Promise.resolve(options.recursive ? {items: []} : {}));
       }
+      res.text().then(msg => print(`Error: ${res.status} ${res.statusText} ${msg}`));
       utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
     }).then(body => {
+      if (options.accountId) {
+        const token = body.account_token;
+        options.accountId = null;
+        print(`Account token: ${token}`);
+        method = restore(options, 'method');
+        params = restore(options, 'params');
+        params.account_token = token;
+        return this.send(method, path, params, bodyObj, options);
+      }
       if (options.recursive) {
         const list = body.items || body.results;
         print(`Already retrieved: ${options.results.length}, newly retrieved: ${list.length}`);
@@ -197,6 +264,8 @@ class OoyalaApi {
         print(`Results: ${options.results.length} items`);
         return options.results;
       }
+      restore(this, 'destination');
+      restore(this, 'secure');
       print(body);
       return body;
     });
