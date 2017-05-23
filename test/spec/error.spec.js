@@ -2,13 +2,16 @@ const test = require('ava');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function createResponse(status, statusText, json, text) {
+function createResponse(status, statusText, text, counter) {
   return {
     status,
     statusText,
     headers: {
       get: h => {
         const header = h.toLowerCase();
+        if (header === 'content-type') {
+          return 'application/json';
+        }
         if (header === 'x-ratelimit-credits') {
           return 2;
         }
@@ -18,9 +21,32 @@ function createResponse(status, statusText, json, text) {
         return 0;
       }
     },
-    json,
-    text
+    text,
+    body: {
+      counter,
+      dataHandler: null,
+      on: bodyOn
+    }
   };
+}
+
+function bodyOn(type, handler) {
+  if (type === 'data') {
+    this.dataHandler = handler;
+  } else if (type === 'end') {
+    if (this.counter === 2) {
+      process.nextTick(() => {
+        this.dataHandler(Buffer.from(JSON.stringify({items: []})));
+        handler();
+      });
+    } else if (this.counter === 3) {
+      process.nextTick(() => {
+        this.dataHandler(Buffer.from(JSON.stringify({})));
+        handler();
+      });
+    }
+  }
+  return {counter: this.counter, dataHandler: this.dataHandler, on: bodyOn};
 }
 
 const responses = [
@@ -45,13 +71,9 @@ const responses = [
 const mock = {
   counter: 0,
   fetch() {
-    // console.log(`[mockFetch] url=${url}, params=${params}`);
-    const res = responses[mock.counter++];
-    return Promise.resolve(createResponse(res.status, res.statusText, mock.json, mock.text));
-  },
-
-  json() {
-    return Promise.reject();
+    const counter = mock.counter++;
+    const res = responses[counter];
+    return Promise.resolve(createResponse(res.status, res.statusText, mock.text, counter));
   },
 
   text() {

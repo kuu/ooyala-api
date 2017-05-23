@@ -17,7 +17,9 @@ if (!config.api) {
   try {
     require(`./command/${argv._[0]}`)(api, argv._.slice(1), argv)
     .then(result => {
-      console.log(result);
+      if (result) {
+        console.log(result);
+      }
     });
   } catch (err) {
     console.error(`${err.message} ${err.stack}`);

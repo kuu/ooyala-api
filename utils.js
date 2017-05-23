@@ -57,6 +57,14 @@ const utils = {
 
   hasOwnProp(obj, propName) {
     return Object.hasOwnProperty.call(obj, propName);
+  },
+
+  tryCatch(body, errorHandler) {
+    try {
+      return body();
+    } catch (err) {
+      return errorHandler(err);
+    }
   }
 };
 

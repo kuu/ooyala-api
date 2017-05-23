@@ -9,16 +9,19 @@ const dummyFetch = {
       status: 200,
       statusText: 'OK',
       headers: {
-        get: () => {
-          return undefined;
+        get: h => {
+          const header = h.toLowerCase();
+          if (header === 'content-type') {
+            return 'application/json';
+          }
+          return null;
         }
       },
-      json: dummyFetch.json
+      body: {
+        dataHandler: null,
+        on: bodyOn
+      }
     });
-  },
-
-  json() {
-    return Promise.resolve(dummyFetch.results.shift());
   },
 
   results: [
@@ -32,6 +35,18 @@ const dummyFetch = {
     {}
   ]
 };
+
+function bodyOn(type, handler) {
+  if (type === 'data') {
+    this.dataHandler = handler;
+  } else if (type === 'end') {
+    process.nextTick(() => {
+      this.dataHandler(Buffer.from(JSON.stringify(dummyFetch.results.shift())));
+      handler();
+    });
+  }
+  return {dataHandler: this.dataHandler, on: bodyOn};
+}
 
 const dummyReadFile = {
   readFile(path, options, cb) {
