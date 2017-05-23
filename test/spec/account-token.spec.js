@@ -15,6 +15,9 @@ const mock = {
       headers: {
         get: h => {
           const header = h.toLowerCase();
+          if (header === 'content-type') {
+            return 'application/json';
+          }
           if (header === 'x-ratelimit-credits') {
             return 2;
           }
@@ -24,17 +27,29 @@ const mock = {
           return 0;
         }
       },
-      json: mock.json
+      body: {
+        dataHandler: null,
+        on: bodyOn
+      }
     });
-  },
-
-  json() {
-    if (mock.counter++ === 0) {
-      return Promise.resolve({account_token: ACCOUNT_TOKEN});
-    }
-    return Promise.resolve({status: 'success'});
   }
 };
+
+function bodyOn(type, handler) {
+  if (type === 'data') {
+    this.dataHandler = handler;
+  } else if (type === 'end') {
+    process.nextTick(() => {
+      if (mock.counter++ === 0) {
+        this.dataHandler(Buffer.from(JSON.stringify({account_token: ACCOUNT_TOKEN})));
+      } else {
+        this.dataHandler(Buffer.from(JSON.stringify({status: 'success'})));
+      }
+      handler();
+    });
+  }
+  return {dataHandler: this.dataHandler, on: bodyOn};
+}
 
 // Override dependencies
 const mockFetch = sinon.spy(mock, 'fetch');

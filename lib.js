@@ -248,7 +248,37 @@ class OoyalaApi {
       }
       print(`${res.status} ${res.statusText}`);
       if (res.status >= 200 && res.status < 300) {
-        return res.json().catch(() => Promise.resolve(options.recursive ? {items: []} : {}));
+        return new Promise((resolve, reject) => {
+          if (options.writeStream) {
+            res.body.pipe(options.writeStream);
+            return resolve();
+          }
+          let fetched = Buffer.alloc(0);
+          res.body.on('data', data => {
+            if (data) {
+              print(`Already retrieved: ${fetched.length}, newly retrieved: ${data.length}`);
+              fetched = Buffer.concat([fetched, data]);
+            }
+          })
+          .on('end', () => {
+            const contentType = res.headers.get('Content-Type');
+            print(`Done: fetched length = ${fetched.length}, Content-Type = ${contentType}`);
+            if (contentType.trim().startsWith('application/json')) {
+              utils.tryCatch(
+                () => {
+                  resolve(JSON.parse(fetched.toString()));
+                },
+                () => {
+                  resolve(options.recursive ? {items: []} : {});
+                }
+              );
+            }
+            resolve(fetched);
+          })
+          .on('error', err => {
+            reject(err);
+          });
+        });
       }
       res.text().then(msg => print(`Error: ${res.status} ${res.statusText} ${msg}`));
       utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
