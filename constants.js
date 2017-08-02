@@ -34,8 +34,9 @@ Example:
   oo upload ./path/to/file --title "My video"
   oo upload ./path/to/files/*.mp4 --title "My videos" --chunkSize 1024 --profile abc
   oo remote "My remote asset" --dash http://x.jp/a.mpd --hls http://x.jp/a.m3u8 --hds http://x.jp/a.f4m
-  oo source embed_code1 > file1
   oo source embed_code1 --info
+  oo source embed_code1 > file1
+  oo source embed_code1 --resume file1
 
 Parameters:
   accountId     Viewer's login id (default = undefined)
@@ -48,6 +49,7 @@ Parameters:
   hls           Remote asset URL for HTTP Live Streaming
   hds           Remote asset URL for HTTP Dynamic Streaming
   info          If specified the output will be source_file_info
+  resume        An existing file to which the data will be appended
 `;
 
 const CONFIG_HELP_TEXT = `

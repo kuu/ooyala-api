@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const debug = require('debug');
 const utils = require('../utils');
@@ -26,7 +25,7 @@ function uploadFiles(api, params, argv) {
   const profile = argv.profile;
   const errors = [];
   return Promise.all(params.map((file, i) => {
-    if (fs.statSync(file).isFile() === false) {
+    if (utils.isFile(file) === false) {
       utils.THROW(new Error(`Invalid path: ${file}`));
     }
     const fileName = path.basename(file);

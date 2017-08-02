@@ -21,6 +21,15 @@ function downloadSourceFile(api, params, argv) {
     if (argv.info) {
       return result;
     }
+    if (argv.resume) {
+      const file = argv.resume;
+      if (utils.isFile(file) === false) {
+        utils.THROW(new Error(`Invalid path: ${file}`));
+      }
+      const size = utils.getFileSize(file);
+
+      return api.get(null, {}, {requestURL: result.source_file_url, writeStream: utils.getWriteStream(file, {flags: 'a'}), headers: {range: `bytes=${size}-`}});
+    }
     return api.get(null, {}, {requestURL: result.source_file_url, writeStream: process.stdout});
   });
 }

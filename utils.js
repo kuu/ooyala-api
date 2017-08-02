@@ -19,6 +19,18 @@ const utils = {
     return ret;
   },
 
+  getFileSize(path) {
+    return fs.statSync(path).size;
+  },
+
+  isFile(path) {
+    return fs.statSync(path).isFile();
+  },
+
+  getWriteStream(path, options) {
+    return fs.createWriteStream(path, options);
+  },
+
   readFile(path, options) {
     return new Promise((resolve, reject) => {
       fs.readFile(path, options, (err, data) => {
