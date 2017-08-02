@@ -98,7 +98,7 @@ Syntax:
   oo sign url [method body]
   oo upload local-file-path(s) [title chunkSize profile]
   oo remote asset-name [dash hls hds]
-  oo source embed-code
+  oo source embed-code [info]
 
 Example:
   oo -v
@@ -111,6 +111,7 @@ Example:
   oo upload ./path/to/files/*.mp4 --title "My videos" --chunkSize 1024 --profile abc
   oo remote "My remote asset" --dash http://x.jp/a.mpd --hls http://x.jp/a.m3u8 --hds http://x.jp/a.f4m
   oo source embed_code1 > file1
+  oo source embed_code1 --info
 
 Parameters:
   accountId     Viewer's login id (default = undefined)
@@ -122,5 +123,6 @@ Parameters:
   dash          Remote asset URL for MPEG-DASH
   hls           Remote asset URL for HTTP Live Streaming
   hds           Remote asset URL for HTTP Dynamic Streaming
+  info          If specified the output will be source_file_info
 
 ```

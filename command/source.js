@@ -3,7 +3,7 @@ const utils = require('../utils');
 
 const print = debug('oo');
 
-function downloadSourceFile(api, params) {
+function downloadSourceFile(api, params, argv) {
   if (params.length === 0) {
     utils.THROW(new Error('Embed code is not specified.'));
   }
@@ -18,6 +18,9 @@ function downloadSourceFile(api, params) {
       utils.THROW(new Error('Failed to get source_file_url.'));
     }
     print(`source_file_url: ${result.source_file_url}`);
+    if (argv.info) {
+      return result;
+    }
     return api.get(null, {}, {requestURL: result.source_file_url, writeStream: process.stdout});
   });
 }
