@@ -111,8 +111,8 @@ Example:
   oo upload ./path/to/files/*.mp4 --title "My videos" --chunkSize 1024 --profile abc
   oo remote "My remote asset" --dash http://x.jp/a.mpd --hls http://x.jp/a.m3u8 --hds http://x.jp/a.f4m
   oo source embed_code1 --info
-  oo source embed_code1 > file1
-  oo source embed_code1 --resume file1
+  oo source embed_code1 > ./path/to/file
+  oo source embed_code1 --resume ./path/to/file
 
 Parameters:
   accountId     Viewer's login id (default = undefined)
