@@ -127,7 +127,7 @@ test.cb('post', t => {
 test.cb('get no content', t => {
   api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
   .then(res => {
-    t.is(res instanceof Array, true);
+    t.is(Array.isArray(res), true);
     t.is(res.length, 0);
     t.end();
   });
