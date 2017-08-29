@@ -8,7 +8,7 @@ function getToken(api, params, argv) {
     utils.THROW(new Error('Embed code is not specified.'));
   }
   const embedCode = params.join(',');
-  print(`token: embedCode='${embedCode}' accountId='${argv.accountId}'`);
+  print(`token: embedCode='${embedCode}' expiration=${argv.expiration} accountId='${argv.accountId}'`);
   return Promise.resolve(api.getTokenRequest(embedCode, argv.accountId));
 }
 

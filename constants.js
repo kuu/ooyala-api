@@ -27,7 +27,9 @@ Syntax:
 Example:
   oo -v
   oo token embed_code
-  oo token embed_code1 embed_code2 --accountId david1203
+  oo token embed_code1 embed_code2
+  oo token embed_code --expiration 604800
+  oo token embed_code --accountId david1203
   oo sign /hoge?foo=bar
   oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}'
   oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}' --method PATCH
@@ -39,6 +41,7 @@ Example:
   oo source embed_code1 --resume ./path/to/file
 
 Parameters:
+  expiration    TTL of the signature in seconds (this param works with every command that requires signing)
   accountId     Viewer's login id (default = undefined)
   method        (GET | POST | PUT | DELETE | PATCH) default = GET
   body          Body string (default = '')

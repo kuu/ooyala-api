@@ -2,6 +2,7 @@ const test = require('ava');
 const rewire = require('rewire');
 const token = require('../../../command/token');
 const utils = require('../../../utils');
+const execute = require('../../../execute');
 
 const OoyalaApi = rewire('../../../lib');
 
@@ -46,6 +47,21 @@ test.cb('token-2', t => {
   token(api, params, argv)
   .then(result => {
     t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_2);
+    t.end();
+  })
+  .catch(err => {
+    t.fail(`error occurred: ${err.message} ${err.trace}`);
+    t.end();
+  });
+});
+
+// oo token embed_code --expiration 604800
+const EXPECTED_3 = `http://player.ooyala.com/sas/embed_token/${API_KEY}/embed_code?expires=1479086981&api_key=123456`;
+test.cb('token-3', t => {
+  const argv = {_: ['token', 'embed_code'], expiration: 604800};
+  execute({key: API_KEY, secret: API_SECRET}, argv)
+  .then(result => {
+    t.is(utils.strip(result, ['signature']), EXPECTED_3);
     t.end();
   })
   .catch(err => {
