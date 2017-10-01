@@ -4,6 +4,7 @@ const proxyquire = require('proxyquire');
 
 const dummyFetch = {
   fetch() {
+  // fetch(url, params) {
     // console.log(`[dummyFetch] url=${url}, params=${params}`);
     return Promise.resolve({
       status: 200,
@@ -30,8 +31,8 @@ const dummyFetch = {
     {}, {}, {},
     {},
     {embed_code: 'xxx'},
-    ['a', 'b', 'c'],
-    {}, {}, {},
+    ['a'],
+    {},
     {}
   ]
 };
@@ -48,10 +49,18 @@ function bodyOn(type, handler) {
   return {dataHandler: this.dataHandler, on: bodyOn};
 }
 
-const dummyReadFile = {
-  readFile(path, options, cb) {
-    // console.log(`[dummyFs.readFile] path=${path}`);
-    cb(null, Buffer.from([1, 2, 3]));
+const dummyOpenSync = {
+  openSync() {
+  // openSync(path, flag) {
+    // console.log(`[dummyFs.openSync] path=${path} flag="${flag}"`);
+    return 1;
+  }
+};
+
+const dummyRead = {
+  read(fd, buffer, offset, length, position, cb) {
+    // console.log(`[dummyFs.dummyRead] offset=${offset} length=${length} position=${position}`);
+    cb(null, length, buffer);
   }
 };
 
@@ -61,17 +70,19 @@ const dummyStatSync = {
     return {
       isFile() {
         return true;
-      }
+      },
+      size: 3
     };
   }
 };
 
 // Override dependencies
 const mockFetch = sinon.spy(dummyFetch, 'fetch');
-const mockReadFile = sinon.spy(dummyReadFile, 'readFile');
+const mockOpenSync = sinon.spy(dummyOpenSync, 'openSync');
+const mockRead = sinon.spy(dummyRead, 'read');
 const mockStatSync = sinon.spy(dummyStatSync, 'statSync');
 
-const utils = proxyquire('../../../utils', {fs: {readFile: mockReadFile, statSync: mockStatSync}});
+const utils = proxyquire('../../../utils', {fs: {openSync: mockOpenSync, read: mockRead, statSync: mockStatSync}});
 const OoyalaApi = proxyquire('../../../lib', {'node-fetch': mockFetch});
 const upload = require('../../../command/upload');
 
@@ -96,8 +107,8 @@ test.cb('upload', t => {
   })
   .then(result => {
     t.is(result, EXPECTED);
-    t.is(mockFetch.callCount, 12);
-    const args = mockFetch.getCall(11).args;
+    t.is(mockFetch.callCount, 10);
+    const args = mockFetch.getCall(9).args;
     const requestURL = 'http://api.ooyala.com/v2/assets/xxx/process';
     const body = {initiation_type: 'original_ingest', processing_profile_id: 'yyy'};
     const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
