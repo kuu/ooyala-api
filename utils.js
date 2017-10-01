@@ -31,14 +31,21 @@ const utils = {
     return fs.createWriteStream(path, options);
   },
 
-  readFile(path, options) {
+  readFile(path, offset, length) {
+    // console.log(`utils.readFile(path="${path}", offset=${offset}, length=${length})`);
     return new Promise((resolve, reject) => {
-      fs.readFile(path, options, (err, data) => {
+      const fd = fs.openSync(path, 'r');
+      if (!fd) {
+        return reject(new Error(`Unable to open file: ${path}`));
+      }
+      fs.read(fd, Buffer.alloc(length), 0, length, offset, (err, bytesRead, buf) => {
         if (err) {
-          reject(err);
-        } else {
-          resolve(data);
+          return reject(err);
         }
+        if (bytesRead < length) {
+          return reject(new Error(`Only ${bytesRead} bytes in ${length} bytes are read: ${path}`));
+        }
+        resolve(buf);
       });
     });
   },
