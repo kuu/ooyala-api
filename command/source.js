@@ -14,13 +14,13 @@ function downloadSourceFile(api, params, argv) {
 
   return api.get(`/v2/assets/${embedCode}/source_file_info`)
   .then(result => {
+    if (argv.info) {
+      return result;
+    }
     if (!result.source_file_url) {
       utils.THROW(new Error('Failed to get source_file_url.'));
     }
     print(`source_file_url: ${result.source_file_url}`);
-    if (argv.info) {
-      return result;
-    }
     if (argv.resume) {
       const file = argv.resume;
       if (utils.isFile(file) === false) {

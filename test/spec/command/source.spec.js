@@ -7,7 +7,7 @@ const dummyInfo = {
   reconstituted_source_file_available: true,
   file_size: 595460784,
   uploaded_by_client: null,
-  source_file_url: 'http://abc.de',
+  source_file_url: null,
   original_file_name: null
 };
 
