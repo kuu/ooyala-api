@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const debug = require('debug');
 const throughParallel = require('through2-parallel');
 const utils = require('./utils');
+const HttpsProxyAgent = require('https-proxy-agent');
 
 const DEFAULT_API_SERVER = 'api.ooyala.com';
 const TOKEN_SERVER = 'player.ooyala.com';
@@ -235,8 +236,11 @@ class OoyalaApi {
 
     print(`[${method}] ${requestURL}
     ${Buffer.isBuffer(bodyToSend) ? `[Buffer length=${bodyToSend.length}]` : bodyToSend}`);
-
-    return fetch(requestURL, {method, body: bodyToSend, headers: options.headers})
+    let requestOption = { method, body: bodyToSend, headers: options.headers };
+    if (options.proxy) {
+      requestOption = { agent: new HttpsProxyAgent(options.proxy) };
+    }
+    return fetch(requestURL, requestOption)
     .then(res => {
       this.credits = parseRateLimit(res, 'Credits');
       print(`'X-RateLimit-Credits': ${this.credits}`);
