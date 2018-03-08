@@ -62,7 +62,7 @@ test('get', async t => {
   const results = await api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true});
   t.not(results, null);
   t.not(results.length, 0);
-  const params = {method: 'GET', body: '', headers: undefined};
+  const params = {method: 'GET', body: null, headers: undefined};
   t.true(mockFetch.calledTwice);
   const {args} = mockFetch.getCall(0);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);

@@ -57,7 +57,7 @@ test('params subdomain', async t => {
   const api = new OoyalaApi(API_KEY, API_SECRET, {subdomain: 'player'});
   const results = await api.get('/v2/assets');
   t.not(results, null);
-  const params = {method: 'GET', body: '', headers: undefined};
+  const params = {method: 'GET', body: null, headers: undefined};
   t.true(mockFetch.calledOnce);
   const {args} = mockFetch.getCall(0);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
