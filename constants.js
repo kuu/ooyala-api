@@ -35,6 +35,7 @@ Example:
   oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}' --method PATCH
   oo upload ./path/to/file --title "My video"
   oo upload ./path/to/files/*.mp4 --title "My videos" --chunkSize 1024 --profile abc
+  oo upload ./path/to/files --title "My VR 360 videos" --profile xyz --vrType monoscopic
   oo remote "My remote asset" --dash http://x.jp/a.mpd --hls http://x.jp/a.m3u8 --hds http://x.jp/a.f4m
   oo source embed_code1 --info
   oo source embed_code1 > ./path/to/file
@@ -48,6 +49,7 @@ Parameters:
   title         Title of the video (default = {file name} if multiple files are specified, the title is suffixed by '- part n')
   chunkSize     Byte size of each chunk (default = 204800)
   profile       Profile id used for encoding
+  vrType        monoscopic or stereoscopic(side-by-side)
   dash          Remote asset URL for MPEG-DASH
   hls           Remote asset URL for HTTP Live Streaming
   hds           Remote asset URL for HTTP Dynamic Streaming
