@@ -22,7 +22,7 @@ function uploadFiles(api, params, argv) {
   if (params.length === 0) {
     utils.THROW(new Error('File is not specified.'));
   }
-  const {profile} = argv;
+  const {profile, vrType} = argv;
   const errors = [];
   return Promise.all(params.map((file, i) => {
     if (utils.isFile(file) === false) {
@@ -35,7 +35,7 @@ function uploadFiles(api, params, argv) {
     }
     const fileName = path.basename(file);
     const title = getTitle(argv, fileName, i);
-    return uploadFile(api, file, title, fileName, chunkSize, totalSize, profile)
+    return uploadFile(api, file, title, fileName, chunkSize, totalSize, profile, vrType)
       .catch(err => {
         errors.push(err);
         return null;
@@ -53,45 +53,50 @@ function uploadFiles(api, params, argv) {
   });
 }
 
-function uploadFile(api, file, title, fileName, chunkSize, totalSize, profile) {
+function uploadFile(api, file, title, fileName, chunkSize, totalSize, profile, vrType) {
   print(`upload: path='${file}' chunkSize='${chunkSize}' totalSize=${totalSize} title='${title}'`);
   const errors = [];
   let embedCode;
-  return api.post('/v2/assets', {}, {
+  const params = {
     name: title,
     file_name: fileName,
     asset_type: 'video',
     file_size: totalSize,
     chunk_size: chunkSize
-  }).then(result => {
-    embedCode = result.embed_code;
-    return api.get(`/v2/assets/${embedCode}/uploading_urls`);
-  }).then(result => {
-    return Promise.all(result.map((url, i) => {
-      const offset = chunkSize * i;
-      const length = Math.min(chunkSize, totalSize - offset);
-      return utils.readFile(file, offset, length)
-        .then(buf => {
-          print(`[PUT] offset=${offset} length=${length} ${url}`);
-          return api.put(null, {}, buf, {requestURL: url, headers: {'Content-Length': length}});
-        }).catch(err => {
-          errors.push(err);
-          return null;
-        });
-    }));
-  }).then(results => {
-    if (results.includes(null)) {
-      utils.THROW(new Error(errors.map(err => {
-        return `Error: ${err.message} ${err.stack}`;
-      }).join('\n')));
-    }
-    if (profile) {
-      return api.post(`/v2/assets/${embedCode}/process`, {}, {initiation_type: 'original_ingest', processing_profile_id: profile});
-    }
-    return api.put(`/v2/assets/${embedCode}/upload_status`, {}, {status: 'uploaded'});
-  }).then(() => {
-    return `Success: ${file} (total bytes=${totalSize}) embed_code="${embedCode}"`;
-  });
+  };
+  if (vrType) {
+    params.vr360type = vrType;
+  }
+  return api.post('/v2/assets', {}, params)
+    .then(result => {
+      embedCode = result.embed_code;
+      return api.get(`/v2/assets/${embedCode}/uploading_urls`);
+    }).then(result => {
+      return Promise.all(result.map((url, i) => {
+        const offset = chunkSize * i;
+        const length = Math.min(chunkSize, totalSize - offset);
+        return utils.readFile(file, offset, length)
+          .then(buf => {
+            print(`[PUT] offset=${offset} length=${length} ${url}`);
+            return api.put(null, {}, buf, {requestURL: url, headers: {'Content-Length': length}});
+          }).catch(err => {
+            errors.push(err);
+            return null;
+          });
+      }));
+    }).then(results => {
+      if (results.includes(null)) {
+        utils.THROW(new Error(errors.map(err => {
+          return `Error: ${err.message} ${err.stack}`;
+        }).join('\n')));
+      }
+      if (profile) {
+        return api.post(`/v2/assets/${embedCode}/process`, {}, {initiation_type: 'original_ingest', processing_profile_id: profile});
+      }
+      return api.put(`/v2/assets/${embedCode}/upload_status`, {}, {status: 'uploaded'});
+    }).then(() => {
+      return `Success: ${file} (total bytes=${totalSize}) embed_code="${embedCode}"`;
+    });
 }
 
 module.exports = uploadFiles;
