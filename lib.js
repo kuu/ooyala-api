@@ -191,7 +191,9 @@ class OoyalaApi {
   send(method, path, params = {}, bodyObj = {}, options = {}) {
     let bodyToSend;
 
-    if (Buffer.isBuffer(bodyObj) || typeof bodyObj === 'string') {
+    if (method === 'GET' || method === 'DELETE' || bodyObj === null) {
+      bodyToSend = null;
+    } else if (Buffer.isBuffer(bodyObj) || typeof bodyObj !== 'object') {
       bodyToSend = bodyObj;
     } else {
       bodyToSend = bodyObj ? stringify(bodyObj) : '';

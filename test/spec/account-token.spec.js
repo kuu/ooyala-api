@@ -72,8 +72,8 @@ test('account-token', async t => {
   t.true(mockFetch.calledTwice);
   const args1 = mockFetch.getCall(0).args;
   t.is(utils.strip(args1[0], ['signatureTimestamp', 'UIDSignature']), requestURL1);
-  t.deepEqual(args1[1], {method: 'POST', body: '', headers: undefined});
+  t.deepEqual(args1[1], {method: 'POST', body: null, headers: undefined});
   const args2 = mockFetch.getCall(1).args;
   t.is(utils.strip(args2[0], ['expires', 'api_key', 'signature']), requestURL2);
-  t.deepEqual(args2[1], {method: 'GET', body: '', headers: undefined});
+  t.deepEqual(args2[1], {method: 'GET', body: null, headers: undefined});
 });
