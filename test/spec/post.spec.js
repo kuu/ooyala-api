@@ -38,18 +38,19 @@ function bodyOn(type, handler) {
   return {dataHandler: this.dataHandler, on: bodyOn};
 }
 
-// Override dependencies
-const mockFetch = sinon.spy(mock, 'fetch');
-const OoyalaApi = proxyquire('../../lib', {'node-fetch': mockFetch});
-
 const API_KEY = '123456';
 const API_SECRET = 'abcdef';
-const api = new OoyalaApi(API_KEY, API_SECRET);
 const FLASH_URL = 'http://flash_url.com';
 
-// let embedCode;
-
 test('post', async t => {
+  // Override dependencies
+  if (typeof mock.fetch.restore === 'function') {
+    mock.fetch.restore();
+  }
+  const mockFetch = sinon.spy(mock, 'fetch');
+  const OoyalaApi = proxyquire('../../lib', {'node-fetch': mockFetch});
+  const api = new OoyalaApi(API_KEY, API_SECRET);
+
   const body = {
     name: `test ${new Date()}`,
     asset_type: 'remote_asset',
@@ -59,12 +60,30 @@ test('post', async t => {
       iphone: 'http://iphone_url.com'
     }
   };
-  const result = await api.post('/v2/assets', {}, body);
-  t.not(result, null);
   const requestURL = 'http://api.ooyala.com/v2/assets';
   const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
+  const result = await api.post('/v2/assets', {}, body);
+  t.not(result, null);
   t.true(mockFetch.calledOnce);
   const {args} = mockFetch.getCall(0);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
+  t.deepEqual(args[1], params);
+});
+
+test('post:body-text', async t => {
+  // Override dependencies
+  if (typeof mock.fetch.restore === 'function') {
+    mock.fetch.restore();
+  }
+  const mockFetch = sinon.spy(mock, 'fetch');
+  const OoyalaApi = proxyquire('../../lib', {'node-fetch': mockFetch});
+  const api = new OoyalaApi(API_KEY, API_SECRET);
+
+  const body = '<body></body>';
+  const params = {method: 'POST', body, headers: undefined};
+  const result = await api.post('/v2/assets', {}, body);
+  t.not(result, null);
+  t.true(mockFetch.calledOnce);
+  const {args} = mockFetch.getCall(0);
   t.deepEqual(args[1], params);
 });
