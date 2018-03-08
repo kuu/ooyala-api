@@ -59,7 +59,7 @@ test('params subdomain', async t => {
   t.not(results, null);
   const params = {method: 'GET', body: '', headers: undefined};
   t.true(mockFetch.calledOnce);
-  const args = mockFetch.getCall(0).args;
+  const {args} = mockFetch.getCall(0);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
   t.deepEqual(args[1], params);
 });

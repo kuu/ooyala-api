@@ -65,12 +65,12 @@ test('get destination', async t => {
   await api.get('/v2/assets', {}, {recursive: true, secure: true, subdomain: 'player'});
   await api.get('/v2/assets', {}, {recursive: true});
   t.is(mockFetch.callCount, 8);
-  let args = mockFetch.getCall(1).args;
+  let {args} = mockFetch.getCall(1);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL1);
-  args = mockFetch.getCall(3).args;
+  ({args} = mockFetch.getCall(3));
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL2);
-  args = mockFetch.getCall(5).args;
+  ({args} = mockFetch.getCall(5));
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL1);
-  args = mockFetch.getCall(7).args;
+  ({args} = mockFetch.getCall(7));
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL2);
 });

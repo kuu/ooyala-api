@@ -51,7 +51,7 @@ const FLASH_URL = 'http://flash_url.com';
 
 test('post', async t => {
   const body = {
-    name: `test ${Date()}`,
+    name: `test ${new Date()}`,
     asset_type: 'remote_asset',
     is_live_stream: true,
     stream_urls: {
@@ -64,7 +64,7 @@ test('post', async t => {
   const requestURL = 'http://api.ooyala.com/v2/assets';
   const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
   t.true(mockFetch.calledOnce);
-  const args = mockFetch.getCall(0).args;
+  const {args} = mockFetch.getCall(0);
   t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
   t.deepEqual(args[1], params);
 });

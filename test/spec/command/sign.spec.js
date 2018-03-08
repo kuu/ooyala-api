@@ -12,14 +12,13 @@ test.cb('sign-1', t => {
   const params = ['/hoge?foo=bar'];
   const argv = {};
   sign(api, params, argv)
-  .then(result => {
-    t.is(result, EXPECTED_1);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(result, EXPECTED_1);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });
 
 //  oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}'
@@ -28,14 +27,13 @@ test.cb('sign-2', t => {
   const params = ['/hoge?foo=bar'];
   const argv = {body: '{"data": {"comment": "This is JSON"}}'};
   sign(api, params, argv)
-  .then(result => {
-    t.is(result, EXPECTED_2);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(result, EXPECTED_2);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });
 
 //  oo sign /hoge?foo=bar --body '{"data": {"comment": "This is JSON"}}' --method PATCH
@@ -47,12 +45,11 @@ test.cb('sign-3', t => {
     method: 'PATCH'
   };
   sign(api, params, argv)
-  .then(result => {
-    t.is(result, EXPECTED_3);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(result, EXPECTED_3);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });

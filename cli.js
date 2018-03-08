@@ -14,11 +14,10 @@ if (!config.api) {
   console.info(constants.VERSION);
 } else {
   execute(config.api, argv, constants)
-  .then(result => {
-    console.log(result);
-  })
-  .catch(err => {
-    console.error(`${err.message} ${err.stack}`);
-    console.info(constants.HELP_TEXT);
-  });
+    .then(result => {
+      console.log(result);
+    }).catch(err => {
+      console.error(`${err.message} ${err.stack}`);
+      console.info(constants.HELP_TEXT);
+    });
 }
