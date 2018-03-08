@@ -94,30 +94,28 @@ const api = new OoyalaApi(API_KEY, API_SECRET);
 const EXPECTED = 'Success: ./path/to/file (total bytes=3) embed_code="xxx"';
 test.cb('upload', t => {
   upload(api, ['./path/to/file'], {title: 'My video', chunkSize: 1})
-  .then(result => {
-    t.is(result, EXPECTED);
-    t.is(mockFetch.callCount, 6);
-    const args = mockFetch.getCall(5).args;
-    const requestURL = 'http://api.ooyala.com/v2/assets/xxx/upload_status';
-    const body = {status: 'uploaded'};
-    const params = {method: 'PUT', body: JSON.stringify(body), headers: undefined};
-    t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
-    t.deepEqual(args[1], params);
-    return upload(api, ['./path/to/file'], {title: 'My video', profile: 'yyy'});
-  })
-  .then(result => {
-    t.is(result, EXPECTED);
-    t.is(mockFetch.callCount, 10);
-    const args = mockFetch.getCall(9).args;
-    const requestURL = 'http://api.ooyala.com/v2/assets/xxx/process';
-    const body = {initiation_type: 'original_ingest', processing_profile_id: 'yyy'};
-    const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
-    t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
-    t.deepEqual(args[1], params);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(result, EXPECTED);
+      t.is(mockFetch.callCount, 6);
+      const {args} = mockFetch.getCall(5);
+      const requestURL = 'http://api.ooyala.com/v2/assets/xxx/upload_status';
+      const body = {status: 'uploaded'};
+      const params = {method: 'PUT', body: JSON.stringify(body), headers: undefined};
+      t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
+      t.deepEqual(args[1], params);
+      return upload(api, ['./path/to/file'], {title: 'My video', profile: 'yyy'});
+    }).then(result => {
+      t.is(result, EXPECTED);
+      t.is(mockFetch.callCount, 10);
+      const {args} = mockFetch.getCall(9);
+      const requestURL = 'http://api.ooyala.com/v2/assets/xxx/process';
+      const body = {initiation_type: 'original_ingest', processing_profile_id: 'yyy'};
+      const params = {method: 'POST', body: JSON.stringify(body), headers: undefined};
+      t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
+      t.deepEqual(args[1], params);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });

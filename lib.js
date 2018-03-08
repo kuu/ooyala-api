@@ -22,13 +22,13 @@ class ParallelStream {
       print(`request: wait for ${oo.secondsToWait} sec`);
       setTimeout(() => {
         oo.send(...obj.params)
-        .then(data => {
-          obj.resolve(data);
-          cb();
-        }).catch(err => {
-          obj.reject(err);
-          cb();
-        });
+          .then(data => {
+            obj.resolve(data);
+            cb();
+          }).catch(err => {
+            obj.reject(err);
+            cb();
+          });
       }, oo.secondsToWait * 1000);
     });
   }
@@ -206,7 +206,7 @@ class OoyalaApi {
     this.push(options);
 
     if (options.requestURL) {
-      requestURL = options.requestURL;
+      ({requestURL} = options);
     } else if (options.accountId) {
       const [uid, signatureTimestamp] = [options.accountId, options.signatureTimestamp || Math.floor(Date.now() / 1000) + 60];
       options.uid = options.signatureTimestamp = null;
@@ -237,77 +237,75 @@ class OoyalaApi {
     ${Buffer.isBuffer(bodyToSend) ? `[Buffer length=${bodyToSend.length}]` : bodyToSend}`);
 
     return fetch(requestURL, {method, body: bodyToSend, headers: options.headers})
-    .then(res => {
-      this.credits = parseRateLimit(res, 'Credits');
-      print(`'X-RateLimit-Credits': ${this.credits}`);
-      if (this.credits < this.concurrency) {
-        this.secondsToWait = parseRateLimit(res, 'Reset');
-        print(`'X-RateLimit-Reset': ${this.secondsToWait}`);
-      } else {
-        this.secondsToWait = 0;
-      }
-      print(`${res.status} ${res.statusText}`);
-      if (res.status >= 200 && res.status < 300) {
-        return new Promise((resolve, reject) => {
-          if (options.writeStream) {
-            res.body.pipe(options.writeStream);
-            return resolve();
-          }
-          let fetched = Buffer.alloc(0);
-          res.body.on('data', data => {
-            if (data) {
-              print(`Already retrieved: ${fetched.length}, newly retrieved: ${data.length}`);
-              fetched = Buffer.concat([fetched, data]);
-            }
-          })
-          .on('end', () => {
-            const contentType = res.headers.get('Content-Type');
-            print(`Done: fetched length = ${fetched.length}, Content-Type = ${contentType}`);
-            if (contentType.trim().startsWith('application/json')) {
-              utils.tryCatch(
-                () => {
-                  resolve(JSON.parse(fetched.toString()));
-                },
-                () => {
-                  resolve(options.recursive ? {items: []} : {});
-                }
-              );
-            }
-            resolve(fetched);
-          })
-          .on('error', err => {
-            reject(err);
-          });
-        });
-      }
-      res.text().then(msg => print(`Error: ${res.status} ${res.statusText} ${msg}`));
-      utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
-    }).then(body => {
-      this.restore();
-      if (options.accountId) {
-        const token = body.account_token;
-        options.accountId = null;
-        print(`Account token: ${token}`);
-        method = restoreValue(options, 'method');
-        params = restoreValue(options, 'params');
-        params.account_token = token;
-        return this.send(method, path, params, bodyObj, options);
-      }
-      if (options.recursive) {
-        const list = body.items || body.results;
-        print(`Already retrieved: ${options.results.length}, newly retrieved: ${list.length}`);
-        options.results = options.results.concat(list);
-        if (body.next_page) {
-          const {pathname, query} = URL.parse(body.next_page, true);
-          return this.send('GET', pathname, query, null, options);
+      .then(res => {
+        this.credits = parseRateLimit(res, 'Credits');
+        print(`'X-RateLimit-Credits': ${this.credits}`);
+        if (this.credits < this.concurrency) {
+          this.secondsToWait = parseRateLimit(res, 'Reset');
+          print(`'X-RateLimit-Reset': ${this.secondsToWait}`);
+        } else {
+          this.secondsToWait = 0;
         }
-        print(`Results: ${options.results.length} items`);
-        return options.results;
-      }
+        print(`${res.status} ${res.statusText}`);
+        if (res.status >= 200 && res.status < 300) {
+          return new Promise((resolve, reject) => {
+            if (options.writeStream) {
+              res.body.pipe(options.writeStream);
+              return resolve();
+            }
+            let fetched = Buffer.alloc(0);
+            res.body.on('data', data => {
+              if (data) {
+                print(`Already retrieved: ${fetched.length}, newly retrieved: ${data.length}`);
+                fetched = Buffer.concat([fetched, data]);
+              }
+            }).on('end', () => {
+              const contentType = res.headers.get('Content-Type');
+              print(`Done: fetched length = ${fetched.length}, Content-Type = ${contentType}`);
+              if (contentType.trim().startsWith('application/json')) {
+                utils.tryCatch(
+                  () => {
+                    resolve(JSON.parse(fetched.toString()));
+                  },
+                  () => {
+                    resolve(options.recursive ? {items: []} : {});
+                  }
+                );
+              }
+              resolve(fetched);
+            }).on('error', err => {
+              reject(err);
+            });
+          });
+        }
+        res.text().then(msg => print(`Error: ${res.status} ${res.statusText} ${msg}`));
+        utils.THROW(new Error(`Response: ${res.status} ${res.statusText}`));
+      }).then(body => {
+        this.restore();
+        if (options.accountId) {
+          const token = body.account_token;
+          options.accountId = null;
+          print(`Account token: ${token}`);
+          method = restoreValue(options, 'method');
+          params = restoreValue(options, 'params');
+          params.account_token = token;
+          return this.send(method, path, params, bodyObj, options);
+        }
+        if (options.recursive) {
+          const list = body.items || body.results;
+          print(`Already retrieved: ${options.results.length}, newly retrieved: ${list.length}`);
+          options.results = options.results.concat(list);
+          if (body.next_page) {
+            const {pathname, query} = URL.parse(body.next_page, true);
+            return this.send('GET', pathname, query, null, options);
+          }
+          print(`Results: ${options.results.length} items`);
+          return options.results;
+        }
 
-      print(body);
-      return body;
-    });
+        print(body);
+        return body;
+      });
   }
 
   getTokenRequest(embedCode, accountId = '') {

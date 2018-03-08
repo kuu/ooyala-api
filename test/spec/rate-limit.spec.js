@@ -62,7 +62,7 @@ test('rate-limit', async t => {
     t.not(results.length, 0);
     const requestURL = `http://api.ooyala.com/v2/assets/${i}`;
     const params = {method: 'GET', body: '', headers: undefined};
-    const args = mockFetch.getCall(i).args;
+    const {args} = mockFetch.getCall(i);
     t.is(utils.strip(args[0], ['expires', 'api_key', 'signature']), requestURL);
     t.deepEqual(args[1], params);
   }

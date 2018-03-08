@@ -99,16 +99,16 @@ test.beforeEach(() => {
 
 test.cb('get', t => {
   api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
-  .catch(err => {
-    const res = responses[0];
-    t.is(err.message, `Response: ${res.status} ${res.statusText}`);
-    t.end();
-  });
+    .catch(err => {
+      const [res] = responses;
+      t.is(err.message, `Response: ${res.status} ${res.statusText}`);
+      t.end();
+    });
 });
 
 test.cb('post', t => {
   const body = {
-    name: `test ${Date()}`,
+    name: `test ${new Date()}`,
     asset_type: 'remote_asset',
     is_live_stream: true,
     stream_urls: {
@@ -117,25 +117,25 @@ test.cb('post', t => {
     }
   };
   api.post('/v2/assets', {}, body)
-  .catch(err => {
-    const res = responses[1];
-    t.is(err.message, `Response: ${res.status} ${res.statusText}`);
-    t.end();
-  });
+    .catch(err => {
+      const [, res] = responses;
+      t.is(err.message, `Response: ${res.status} ${res.statusText}`);
+      t.end();
+    });
 });
 
 test.cb('get no content', t => {
   api.get('/v2/assets', {where: `labels+INCLUDES+'Music'`}, {recursive: true})
-  .then(res => {
-    t.is(Array.isArray(res), true);
-    t.is(res.length, 0);
-    t.end();
-  });
+    .then(res => {
+      t.is(Array.isArray(res), true);
+      t.is(res.length, 0);
+      t.end();
+    });
 });
 
 test.cb('post no content', t => {
   const body = {
-    name: `test ${Date()}`,
+    name: `test ${new Date()}`,
     asset_type: 'remote_asset',
     is_live_stream: true,
     stream_urls: {
@@ -144,9 +144,9 @@ test.cb('post no content', t => {
     }
   };
   api.post('/v2/assets', {}, body)
-  .then(res => {
-    t.is(res instanceof Object, true);
-    t.is(Object.keys(res).length, 0);
-    t.end();
-  });
+    .then(res => {
+      t.is(res instanceof Object, true);
+      t.is(Object.keys(res).length, 0);
+      t.end();
+    });
 });

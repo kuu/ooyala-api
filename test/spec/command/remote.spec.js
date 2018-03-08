@@ -77,24 +77,23 @@ test.cb('remote', t => {
     }
   ];
   remote(api, params, argv)
-  .then(() => {
-    t.true(mockFetch.calledTwice);
-    for (let i = 0; i < 2; i++) {
-      const call = mockFetch.getCall(i);
-      t.truthy(call);
-      const args = call.args;
-      t.true(typeof args[0] === 'string');
-      t.true(args[0].indexOf(requestURLs[i]) === 0);
-      t.truthy(args[1]);
-      const obj = args[1];
-      t.is(obj.method, method);
-      t.deepEqual(JSON.parse(obj.body), bodys[i]);
-      t.is(obj.headers, undefined);
-    }
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(() => {
+      t.true(mockFetch.calledTwice);
+      for (let i = 0; i < 2; i++) {
+        const call = mockFetch.getCall(i);
+        t.truthy(call);
+        const {args} = call;
+        t.true(typeof args[0] === 'string');
+        t.true(args[0].indexOf(requestURLs[i]) === 0);
+        t.truthy(args[1]);
+        const [, obj] = args;
+        t.is(obj.method, method);
+        t.deepEqual(JSON.parse(obj.body), bodys[i]);
+        t.is(obj.headers, undefined);
+      }
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });

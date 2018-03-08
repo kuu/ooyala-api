@@ -29,14 +29,13 @@ test.cb('token-1', t => {
   const params = ['embed_code'];
   const argv = {};
   token(api, params, argv)
-  .then(result => {
-    t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_1);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_1);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });
 
 // oo token embed_code1 embed_code2 --accountId david1203
@@ -45,14 +44,13 @@ test.cb('token-2', t => {
   const params = ['embed_code1', 'embed_code2'];
   const argv = {accountId: 'david1203'};
   token(api, params, argv)
-  .then(result => {
-    t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_2);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(utils.strip(result, ['expires', 'signature']), EXPECTED_2);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });
 
 // oo token embed_code --expiration 604800
@@ -60,12 +58,11 @@ const EXPECTED_3 = `http://player.ooyala.com/sas/embed_token/${API_KEY}/embed_co
 test.cb('token-3', t => {
   const argv = {_: ['token', 'embed_code'], expiration: 604800};
   execute({key: API_KEY, secret: API_SECRET}, argv)
-  .then(result => {
-    t.is(utils.strip(result, ['signature']), EXPECTED_3);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.is(utils.strip(result, ['signature']), EXPECTED_3);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });

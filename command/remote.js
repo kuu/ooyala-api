@@ -13,7 +13,7 @@ function createRemoteAsset(api, params, argv) {
 
   if (!dash && !hls && !hds) {
     if (params.length > 1) {
-      hls = params[1];
+      [, hls] = params;
     } else {
       utils.THROW(new Error('No URL specified. Either dash or hls or hds should be specified.'));
     }
@@ -41,13 +41,13 @@ function createRemoteAsset(api, params, argv) {
   };
 
   return api.post('/v2/assets', {}, assetData)
-  .then(result => {
-    if (!result.embed_code) {
-      utils.THROW(new Error('Failed to create a remote asset.'));
-    }
-    const urlData = {dash, hls, hds};
-    return api.post(`/v2/assets/${result.embed_code}/movie_urls`, {}, urlData);
-  });
+    .then(result => {
+      if (!result.embed_code) {
+        utils.THROW(new Error('Failed to create a remote asset.'));
+      }
+      const urlData = {dash, hls, hds};
+      return api.post(`/v2/assets/${result.embed_code}/movie_urls`, {}, urlData);
+    });
 }
 
 module.exports = createRemoteAsset;

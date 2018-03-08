@@ -60,13 +60,12 @@ const api = new OoyalaApi(API_KEY, API_SECRET);
 // oo source embed_code1 --info
 test.cb('source info', t => {
   source(api, 'embed_code1', {info: true})
-  .then(result => {
-    t.truthy(result);
-    t.deepEqual(result, dummyInfo);
-    t.end();
-  })
-  .catch(err => {
-    t.fail(`error occurred: ${err.message} ${err.trace}`);
-    t.end();
-  });
+    .then(result => {
+      t.truthy(result);
+      t.deepEqual(result, dummyInfo);
+      t.end();
+    }).catch(err => {
+      t.fail(`error occurred: ${err.message} ${err.trace}`);
+      t.end();
+    });
 });
